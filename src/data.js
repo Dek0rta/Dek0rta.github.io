@@ -42,13 +42,10 @@ export const projects = [
   },
 ];
 
-// fill real handles — placeholders for now
 export const socials = [
-  { name: "GitHub",   handle: "@Dek0rta",      url: "https://github.com/Dek0rta",                    icon: "github" },
-  { name: "Telegram", handle: "@dek0rta",      url: "https://t.me/dek0rta",                          icon: "telegram" },
-  { name: "X",        handle: "@dek0rta",      url: "https://x.com/dek0rta",                         icon: "x" },
-  { name: "LinkedIn", handle: "in/dek0rta",    url: "https://linkedin.com/in/dek0rta",               icon: "linkedin" },
-  { name: "Email",    handle: "levavdoshin.connect@gmail.com", url: "mailto:levavdoshin.connect@gmail.com", icon: "mail" },
+  { name: "GitHub",   handle: "@Dek0rta",          url: "https://github.com/Dek0rta",      icon: "github" },
+  { name: "Telegram", handle: "@dek0rta",          url: "https://t.me/dek0rta",            icon: "telegram" },
+  { name: "Email",    handle: "Dek0rta@yandex.com", url: "mailto:Dek0rta@yandex.com",      icon: "mail" },
 ];
 
 // placeholder — replaced by live Spotify later

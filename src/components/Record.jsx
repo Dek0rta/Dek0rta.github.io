@@ -43,6 +43,18 @@ export default function Record() {
   const layoutRef = useRef(null); // {layout, weeks, inset} for hover + axis
   const [repos, setRepos] = useState(snapshot.publicRepos);
   const [ticks, setTicks] = useState([]); // month axis marks
+  // phones crop the lattice to a trailing window; rebuild the field when the
+  // viewport crosses that breakpoint so a rotate/resize re-fits the grid.
+  const [narrow, setNarrow] = useState(
+    typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 600px)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 600px)");
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const reducedRef = useRef(
     typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -63,7 +75,15 @@ export default function Record() {
     const mount = mountRef.current;
     if (!mount) return;
 
-    const days = snapshot.days;
+    // narrow screens can't fit 53 weeks without crushing the columns into the
+    // right edge (the account is young — the live data sits in the last few
+    // months, so the left two-thirds is just empty pins). On phones, crop the
+    // lattice to a trailing window so the worked days fill the plate instead.
+    const WINDOW_WEEKS = 26; // ~6 months — covers all the real activity
+    const full = snapshot.days;
+    const days = narrow
+      ? full.slice(Math.max(0, full.length - WINDOW_WEEKS * ROWS))
+      : full;
     const N = days.length;
 
     // ── grid geometry: lay days into weeks (column) × weekday (row) ──
@@ -456,7 +476,7 @@ export default function Record() {
       if (renderer.domElement.parentNode === mount)
         mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [narrow]);
 
   const since = snapshot.createdAt
     ? new Date(snapshot.createdAt).toLocaleDateString("en-US", {

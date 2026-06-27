@@ -1,0 +1,213 @@
+.record {
+  padding: clamp(80px, 14vh, 160px) 0 clamp(60px, 10vh, 120px);
+}
+
+.record__inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* folio marker — matches the cover's 00 · Cover treatment */
+.record__folio {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: clamp(32px, 6vh, 64px);
+  font-family: var(--mono);
+}
+.record__folio-no {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--seal);
+  letter-spacing: 0.04em;
+}
+.record__folio-label {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.record__head {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(24px, 5vw, 72px);
+  align-items: end;
+  margin-bottom: clamp(28px, 5vh, 56px);
+}
+.record__title {
+  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.record__lede {
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+/* the ink field — WebGL canvas + the month axis + the hover read-out */
+.record__plate {
+  position: relative;
+  margin: clamp(8px, 2vh, 24px) 0 clamp(32px, 5vh, 56px);
+  /* faint frame so the field reads as a plate in the journal */
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: clamp(16px, 3.4vh, 36px) 0 0;
+}
+.record__field {
+  position: relative;
+  width: 100%;
+  /* taller plate → the lattice reads as a dense calendar, not a flat smear */
+  aspect-ratio: 53 / 11;
+  min-height: 230px;
+  cursor: crosshair;
+}
+.record__field canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── month axis: labels sit under the lattice, aligned to week columns ── */
+.record__axis {
+  position: relative;
+  height: 22px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  user-select: none;
+  pointer-events: none;
+}
+.record__tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0.7;
+}
+.record__tick::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  width: 1px;
+  height: 6px;
+  background: var(--hairline);
+}
+
+/* ── hover read-out: one day, named + dated ── */
+.record__read {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, calc(-100% - 14px));
+  padding: 7px 11px;
+  background: var(--bg);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 8px 24px rgba(18, 17, 15, 0.1);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.record__read.is-on {
+  opacity: 1;
+}
+.record__read-date {
+  color: var(--fg);
+  letter-spacing: 0.02em;
+}
+.record__read-level {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+}
+.record__read-level em {
+  font-style: normal;
+  color: var(--seal);
+}
+/* little pointer pip aimed at the dot */
+.record__read::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  background: var(--bg);
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* ledger — the hard numbers under the plate */
+.record__ledger {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 3vw, 40px);
+  margin: 0;
+}
+.record__entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+}
+.record__entry-val {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.record__entry:first-child .record__entry-val {
+  font-style: italic;
+  color: var(--seal);
+}
+.record__entry-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 860px) {
+  .record__head {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .record__ledger {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .record__field {
+    aspect-ratio: 26 / 10;
+    overflow: hidden;
+  }
+  /* axis gets crowded on phones — thin it to season-ish marks via CSS nth */
+  .record__tick:nth-child(even) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record__field {
+    cursor: default;
+  }
+}

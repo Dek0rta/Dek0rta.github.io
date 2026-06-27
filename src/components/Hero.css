@@ -1,74 +1,393 @@
 .hero {
-  position: relative;
   min-height: 100svh;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  padding: clamp(96px, 12vh, 150px) 0 clamp(40px, 6vh, 72px);
+  overflow: hidden; /* portrait bleeds to the edge; clip the overflow */
 }
 
-.hero-canvas {
+.hero__inner {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: stretch;
+  gap: clamp(20px, 3vw, 56px);
+}
+
+/* left column runs top-to-bottom: masthead up top, live seal at the foot */
+.hero__lead {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+/* baseline rule under the masthead foot, like the proof */
+.hero__lead::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  left: 0;
+  bottom: -8px;
+  width: clamp(56px, 8vw, 120px);
+  height: 2px;
+  background: var(--seal);
+}
+
+/* ── portrait plate, bled to the right edge ── */
+.hero__figure {
+  position: relative;
+  margin: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* bleed past the right edge of the wrap so the figure fills the corner */
+  margin-right: calc(-1 * clamp(16px, 4vw, 64px));
+}
+
+/* furniture rides ABOVE the portrait so the design crosses over the photo —
+   the line, the dots, the diamond all overlap the figure and stitch it in. */
+.hero__arc,
+.hero__dots,
+.hero__diamond,
+.hero__rule {
+  z-index: 3;
+}
+/* big quarter-arc behind the head — the seal ring, drawn large */
+.hero__arc {
+  position: absolute;
+  top: 2%;
+  right: -6%;
+  width: clamp(220px, 32vw, 520px);
+  height: clamp(220px, 32vw, 520px);
+  border: 1.5px solid var(--seal);
+  border-radius: 50%;
+  clip-path: polygon(46% 0, 100% 0, 100% 64%, 46% 64%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* dot grid sitting over the shoulder — printed register texture crossing the
+   photo edge so it reads as one composited plate. */
+.hero__dots {
+  position: absolute;
+  right: 6%;
+  top: 52%;
+  width: clamp(100px, 12vw, 170px);
+  height: clamp(100px, 12vw, 170px);
+  background-image: radial-gradient(var(--seal) 1.3px, transparent 1.4px);
+  background-size: 14px 14px;
+  opacity: 0.34;
+  pointer-events: none;
+}
+.hero__diamond {
+  position: absolute;
+  top: 16%;
+  right: 4%;
+  width: 12px;
+  height: 12px;
+  background: var(--seal);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+/* thin diagonal horizon slicing across the chest, over the photo */
+.hero__rule {
+  position: absolute;
+  left: -22%;
+  right: -8%;
+  bottom: 22%;
+  height: 1px;
+  background: var(--seal);
+  opacity: 0.6;
+  transform: rotate(-4deg);
+  transform-origin: right center;
   pointer-events: none;
 }
 
-.hero-fg {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-}
-
-.hero-eyebrow {
-  margin-bottom: 22px;
-}
-
-.hero-tagline {
-  font-size: clamp(34px, 7vw, 84px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-  max-width: 14ch;
-  background: linear-gradient(180deg, #fff 0%, #c9ccda 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.hero-scroll {
+.hero__portrait {
   position: absolute;
-  left: 50%;
-  bottom: 34px;
-  transform: translateX(-50%);
-  z-index: 2;
+  z-index: 1;
+  /* anchor to the bottom-right corner of the figure and let the head run up
+     toward the top — a cropped, full-bleed editorial figure. */
+  right: 0;
+  bottom: 0;
+  top: clamp(20px, 4vh, 70px);
+  width: clamp(440px, 52vw, 780px);
+}
+/* faint round glow behind the head — peels the subject off the paper without
+   reading as a halo. sits under the photo. */
+.hero__portrait::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    30% 26% at 66% 58%,
+    color-mix(in srgb, var(--seal) 7%, transparent) 0%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+/* atmospheric haze: a soft wash of the page colour pooled at the foot of the
+   figure so the body dissolves into the paper rather than ending on a line. */
+.hero__portrait::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -8%;
+  right: -8%;
+  bottom: 0;
+  height: 30%;
+  background: linear-gradient(
+    to top,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg) 62%, transparent) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+.hero__portrait img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  /* keep the face sharp + skin natural; nudge warm to meet the cream paper */
+  filter: contrast(1.02) saturate(1.04) sepia(0.06) brightness(1.02)
+    drop-shadow(-14px 18px 40px rgba(18, 17, 15, 0.18));
+  /* feather every edge into the page — strong at the foot, soft on the sides,
+     face + upper body stay fully opaque. */
+  --mask: linear-gradient(
+      to top,
+      transparent 0%,
+      rgba(0, 0, 0, 0.4) 14%,
+      #000 30%
+    ),
+    radial-gradient(
+      94% 104% at 60% 44%,
+      #000 64%,
+      transparent 100%
+    ),
+    linear-gradient(to right, transparent 0%, #000 14%);
+  -webkit-mask: var(--mask);
+  -webkit-mask-composite: source-in;
+  mask: var(--mask);
+  mask-composite: intersect;
+}
+
+.hero__folio {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+}
+.hero__folio-no {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.24em;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--seal);
+}
+.hero__folio-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--muted);
 }
 
-.hero-scroll-line {
-  width: 1px;
-  height: 38px;
-  background: linear-gradient(180deg, var(--text-faint), transparent);
-  animation: scroll-bounce 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  transform-origin: top;
+.hero__title {
+  font-size: clamp(2.6rem, 7vw, 6.2rem);
+  line-height: 0.96;
+  max-width: 18ch;
+  margin: 0;
+}
+.hero__line {
+  display: block;
+  overflow: hidden;
+  padding: 0.04em 0;
+}
+.hero__line-inner {
+  display: block;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+.hero__line--em {
+  font-style: italic;
+  font-weight: 380;
+  color: var(--seal);
 }
 
-@keyframes scroll-bounce {
-  0%, 100% { transform: scaleY(1) translateY(0); opacity: 0.7; }
-  50% { transform: scaleY(0.7) translateY(6px); opacity: 1; }
+/* foot block: seal sits above, colophon line below */
+.hero__foot {
+  margin-top: clamp(28px, 5vh, 56px);
+}
+
+/* ── live seal: ◆  714+  ◦ ── */
+.hero__seal {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: clamp(16px, 2vw, 28px);
+  align-items: center;
+}
+.hero__seal-mark {
+  grid-row: 1 / 3;
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  color: var(--seal);
+  line-height: 1;
+}
+.hero__seal-num {
+  grid-column: 2;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  transition: color 0.5s ease;
+}
+.hero__seal-num.is-bump {
+  animation: seal-bump 0.6s ease-out;
+}
+@keyframes seal-bump {
+  0% {
+    color: var(--seal);
+    transform: translateY(-2px);
+  }
+  40% {
+    color: var(--seal);
+  }
+  100% {
+    color: var(--fg);
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__seal-num.is-bump {
+    animation: none;
+  }
+}
+.hero__seal-label {
+  grid-column: 2;
+  grid-row: 2;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  white-space: nowrap;
+}
+.hero__live {
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--seal);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 10px;
+}
+.hero__live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--seal);
+  box-shadow: 0 0 0 0 var(--seal);
+  animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--seal) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+/* ringed register dot to the right of the count */
+.hero__pip {
+  grid-column: 4;
+  grid-row: 1 / 3;
+  width: clamp(40px, 5vw, 58px);
+  height: clamp(40px, 5vw, 58px);
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  justify-self: start;
+}
+.hero__pip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--seal);
+}
+
+/* mono colophon line — sits at the foot of the masthead column, on clean
+   paper, never over the portrait. */
+.hero__sig {
+  margin: clamp(18px, 3vh, 30px) 0 0;
+  max-width: 30ch;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.hero__sig em {
+  font-style: normal;
+  color: var(--seal);
+}
+
+/* portrait drops below the masthead on narrower screens */
+@media (max-width: 900px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    gap: clamp(24px, 5vh, 48px);
+  }
+  .hero__figure {
+    order: -1;
+    align-self: center;
+    min-height: 46vh;
+  }
+  .hero__portrait {
+    min-height: 46vh;
+  }
+  .hero__sig {
+    position: static;
+    margin: 14px auto 0;
+    text-align: center;
+  }
+  .hero__lead::after {
+    display: none;
+  }
+  .hero__arc,
+  .hero__rule {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero__seal {
+    grid-template-columns: auto auto;
+  }
+  .hero__pip {
+    display: none;
+  }
+  .hero__seal-label {
+    white-space: normal;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-scroll-line { animation: none; }
-}
-
-@media (max-width: 640px) {
-  .hero-tagline { max-width: 12ch; }
+  .hero__live-dot {
+    animation: none;
+  }
 }

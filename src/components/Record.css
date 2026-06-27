@@ -197,7 +197,11 @@
 
 @media (max-width: 480px) {
   .record__field {
-    aspect-ratio: 26 / 10;
+    /* let the aspect set the height — the desktop min-height (230px) was
+       forcing the canvas taller than 26/10, so the 7 rows tore apart
+       vertically. clamp keeps it dense without stretching the lattice. */
+    aspect-ratio: 26 / 11;
+    min-height: clamp(150px, 42vw, 200px);
     overflow: hidden;
   }
   /* axis gets crowded on phones — thin it to season-ish marks via CSS nth */

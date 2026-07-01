@@ -2,6 +2,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { projects } from "../data";
 import Tear from "./Tear";
+import { ProofMark } from "./Proof";
 // this very file, as text, at build time — the tear can't show a stale copy
 import projectsSource from "./Projects.jsx?raw";
 import "./Projects.css";
@@ -101,6 +102,7 @@ export default function Projects() {
             <span className="folio__no">01</span>
             <span className="folio__rule" />
             <span className="folio__label">What I shipped</span>
+            <ProofMark k="shipped" />
           </div>
 
           <div className="projects__list">

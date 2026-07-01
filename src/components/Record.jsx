@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import snapshot from "../github.json";
 import { profile } from "../data";
+import { ProofMark } from "./Proof";
 import "./Record.css";
 
 // THE RECORD — a year of work, rendered as an ink field.
@@ -491,6 +492,7 @@ export default function Record() {
         <p className="record__folio" data-reveal>
           <span className="record__folio-no">01</span>
           <span className="record__folio-label">The Record</span>
+          <ProofMark k="record" />
         </p>
 
         <div className="record__head">

@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { socials, profile } from "../data";
+import { ProofTotal } from "./Proof";
 import "./Colophon.css";
 
 const icons = {
@@ -85,6 +86,7 @@ export default function Colophon() {
           <span className="colo__base-note">
             Set in Fraunces &amp; JetBrains Mono. Built by hand with React, three.js &amp; GSAP.
           </span>
+          <ProofTotal />
         </div>
       </div>
     </footer>

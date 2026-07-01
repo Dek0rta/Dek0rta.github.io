@@ -1,4 +1,5 @@
 import { stack } from "../data";
+import { ProofMark } from "./Proof";
 import "./Stack.css";
 
 export default function Stack() {
@@ -9,6 +10,7 @@ export default function Stack() {
           <span className="folio__no">02</span>
           <span className="folio__rule" />
           <span className="folio__label">The stack</span>
+          <ProofMark k="stack" />
         </div>
 
         <p className="stack__lead display" data-reveal>

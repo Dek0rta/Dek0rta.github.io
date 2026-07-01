@@ -3,6 +3,8 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import Issue from "./components/Issue";
+import Thread from "./components/Thread";
 import Cursor from "./components/Cursor";
 import Topbar from "./components/Topbar";
 import Hero from "./components/Hero";
@@ -77,7 +79,9 @@ export default function App() {
           });
         gsap.set(furniture, { opacity: 0 });
 
-        const tl = gsap.timeline({ delay: 0.15 });
+        // hero assembles as the issue sheet lifts away (Issue holds ~1.6s
+        // before its wipe) — the cover is "developing" underneath as it clears
+        const tl = gsap.timeline({ delay: reduced ? 0.15 : 1.9 });
         tl.to(lineInners, {
           yPercent: 0,
           duration: 1.1,
@@ -196,6 +200,8 @@ export default function App() {
 
   return (
     <>
+      <Issue />
+      <Thread />
       <div className="grain" />
       <Cursor />
       <Topbar />

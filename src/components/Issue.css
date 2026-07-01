@@ -1,0 +1,89 @@
+/* freeze the page behind the sheet until it lifts */
+html.issue-locked,
+html.issue-locked body {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── the cover sheet that lifts away on load ── */
+.issue {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.issue__inner {
+  width: 100%;
+  max-width: var(--maxw);
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+
+/* each line rides inside its own clip so it can slide up cleanly */
+.issue__kicker,
+.issue__meta,
+.issue__mask {
+  overflow: hidden;
+}
+.issue__kicker > span,
+.issue__meta > span,
+.issue__mask > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.issue__kicker {
+  font-family: var(--mono);
+  font-size: clamp(11px, 1.4vw, 13px);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--seal);
+  margin-bottom: clamp(18px, 3vh, 30px);
+}
+
+.issue__name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.9;
+  font-weight: 360;
+  font-size: clamp(56px, 13vw, 168px);
+}
+
+.issue__rule {
+  margin: clamp(20px, 4vh, 40px) auto clamp(16px, 3vh, 26px);
+  width: clamp(120px, 30vw, 360px);
+}
+.issue__rule-line {
+  display: block;
+  height: 1px;
+  background: var(--fg);
+  opacity: 0.45;
+  width: 100%;
+  transform-origin: left center;
+}
+
+.issue__meta {
+  font-family: var(--mono);
+  font-size: clamp(12px, 1.6vw, 15px);
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .issue {
+    transition: none;
+  }
+  .issue__kicker > span,
+  .issue__meta > span,
+  .issue__mask > span,
+  .issue__rule-line {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

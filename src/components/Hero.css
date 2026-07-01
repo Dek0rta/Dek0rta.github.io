@@ -126,6 +126,7 @@
     transparent 72%
   );
   pointer-events: none;
+  transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* atmospheric haze: a soft wash of the page colour pooled at the foot of the
    figure so the body dissolves into the paper rather than ending on a line. */
@@ -137,13 +138,26 @@
   right: -8%;
   bottom: 0;
   height: 30%;
-  background: linear-gradient(
+  /* solid page colour, FADED by a fixed mask — not a colour-stop gradient.
+     gradients with var(--bg) stops can't be transitioned, so the haze used to
+     snap theme ahead of the page. background-color transitions cleanly. */
+  background-color: var(--bg);
+  -webkit-mask: linear-gradient(
     to top,
-    var(--bg) 0%,
-    color-mix(in srgb, var(--bg) 62%, transparent) 40%,
+    #000 0%,
+    rgba(0, 0, 0, 0.62) 40%,
+    transparent 100%
+  );
+  mask: linear-gradient(
+    to top,
+    #000 0%,
+    rgba(0, 0, 0, 0.62) 40%,
     transparent 100%
   );
   pointer-events: none;
+  /* match the body's theme crossfade so the foot-haze doesn't snap colour
+     ahead of the page when the theme flips */
+  transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hero__portrait img {
   position: absolute;

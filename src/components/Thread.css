@@ -1,0 +1,123 @@
+/* ── THE THREAD — the issue's spine, drawn down the left margin ── */
+.thread {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200px;
+  z-index: 3; /* above the WebGL/grain, below the cursor (9999) */
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* tuck the thread away where the margin lane would collide with content */
+@media (max-width: 900px) {
+  .thread {
+    display: none;
+  }
+}
+
+.thread__line {
+  opacity: 0.95;
+  filter: drop-shadow(0 0 0.5px var(--seal));
+  transition: stroke 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.thread__start {
+  fill: var(--seal);
+  opacity: 0.9;
+}
+
+.thread__nib {
+  fill: var(--seal);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--seal) 60%, transparent));
+}
+
+/* tie from the stroke to the folio number — draws in when the chapter lands */
+.thread__tie {
+  stroke: var(--seal);
+  stroke-width: 1;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.thread__node.is-lit .thread__tie {
+  opacity: 0.5;
+  transform: scaleX(1);
+}
+
+/* nodes are mounted only after the doc settles — fade them in on the spot so
+   they never appear to jump up from a shorter pre-settle layout. */
+.thread__node {
+  animation: thread-node-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes thread-node-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── chapter nodes ── quiet until their section arrives, then struck ── */
+.thread__node-ring {
+  fill: none;
+  stroke: var(--seal);
+  stroke-width: 1;
+  opacity: 0.22;
+  transform: scale(0.6);
+  transform-origin: center;
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.thread__node-dot {
+  fill: var(--seal);
+  opacity: 0.3;
+  transition: opacity 0.45s ease, r 0.4s ease;
+}
+.thread__node-no {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  fill: var(--muted);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.thread__node-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  fill: var(--muted);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.5s ease 0.05s,
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
+}
+
+/* lit state — the chapter you're reading */
+.thread__node.is-lit .thread__node-ring {
+  opacity: 0.7;
+  transform: scale(1);
+}
+.thread__node.is-lit .thread__node-dot {
+  opacity: 1;
+}
+.thread__node.is-lit .thread__node-no,
+.thread__node.is-lit .thread__node-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thread__node {
+    animation: none;
+  }
+  .thread__node-ring,
+  .thread__node-dot,
+  .thread__node-no,
+  .thread__node-label {
+    transition: none;
+  }
+}

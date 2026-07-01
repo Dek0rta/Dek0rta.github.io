@@ -18,7 +18,7 @@ export default function Hero() {
     let raf;
     const start = performance.now();
     const dur = 1800;
-    const delay = 900; // let the name land first
+    const delay = 2600; // wait out the issue sheet + let the name land first
     const tick = (now) => {
       const t = Math.min(1, Math.max(0, (now - start - delay) / dur));
       const eased = 1 - Math.pow(1 - t, 3);
@@ -45,7 +45,7 @@ export default function Hero() {
         schedule();
       }, wait);
     };
-    const kickoff = setTimeout(schedule, 3200); // start after the 0→liveUsers run
+    const kickoff = setTimeout(schedule, 5000); // start after the 0→liveUsers run
     return () => {
       clearTimeout(timer);
       clearTimeout(kickoff);

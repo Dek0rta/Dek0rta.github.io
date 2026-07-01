@@ -209,3 +209,40 @@ main,
     transition: none;
   }
 }
+
+/* ── THE BURN — theme switch as arson (see src/burn.js) ──
+   the old theme is the browser's view-transition snapshot, held on top and
+   clipped by a live noise-driven path; the new edition waits underneath. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(root) {
+  z-index: 2;
+  clip-path: var(--burn-clip, none);
+  opacity: var(--burn-alpha, 1);
+  transition: opacity 0.25s ease;
+  /* hold the snapshot for the whole burn — duration matches HOLD_MS */
+  animation: vt-burn-hold 1750ms steps(1, end) both;
+}
+::view-transition-new(root) {
+  z-index: 1;
+  animation: none;
+}
+/* animates a harmless property — opacity must stay free for --burn-alpha */
+@keyframes vt-burn-hold {
+  from {
+    visibility: visible;
+  }
+  to {
+    visibility: visible;
+  }
+}
+/* embers + ash live between the two editions, above the live page */
+.burn-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9500;
+  pointer-events: none;
+}

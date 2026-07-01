@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { profile } from "../data";
+import { burnTheme } from "../burn";
 import "./Topbar.css";
 
 export default function Topbar() {
@@ -11,11 +12,16 @@ export default function Topbar() {
     document.documentElement.setAttribute("data-theme", saved);
   }, []);
 
-  const toggle = () => {
+  const toggle = (e) => {
     const next = theme === "day" ? "night" : "day";
-    setTheme(next);
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("issue-theme", next);
+    const flip = () => {
+      setTheme(next);
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("issue-theme", next);
+    };
+    // the switch is a match — the fire starts where you struck it
+    const r = e.currentTarget.getBoundingClientRect();
+    burnTheme(r.left + r.width / 2, r.top + r.height / 2, flip);
   };
 
   return (

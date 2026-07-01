@@ -1,6 +1,9 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { projects } from "../data";
+import Tear from "./Tear";
+// this very file, as text, at build time — the tear can't show a stale copy
+import projectsSource from "./Projects.jsx?raw";
 import "./Projects.css";
 
 const Arrow = () => (
@@ -92,19 +95,21 @@ function Entry({ project }) {
 export default function Projects() {
   return (
     <section className="section projects" id="shipped">
-      <div className="wrap">
-        <div className="folio" data-reveal>
-          <span className="folio__no">01</span>
-          <span className="folio__rule" />
-          <span className="folio__label">What I shipped</span>
-        </div>
+      <Tear source={projectsSource} filename="Projects.jsx">
+        <div className="wrap">
+          <div className="folio" data-reveal>
+            <span className="folio__no">01</span>
+            <span className="folio__rule" />
+            <span className="folio__label">What I shipped</span>
+          </div>
 
-        <div className="projects__list">
-          {projects.map((p) => (
-            <Entry key={p.name} project={p} />
-          ))}
+          <div className="projects__list">
+            {projects.map((p) => (
+              <Entry key={p.name} project={p} />
+            ))}
+          </div>
         </div>
-      </div>
+      </Tear>
     </section>
   );
 }

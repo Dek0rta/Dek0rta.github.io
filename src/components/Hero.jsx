@@ -18,7 +18,7 @@ export default function Hero() {
     let raf;
     const start = performance.now();
     const dur = 1800;
-    const delay = 2600; // wait out the issue sheet + let the name land first
+    const delay = 4000; // wait out the ink overture + let the name land first
     const tick = (now) => {
       const t = Math.min(1, Math.max(0, (now - start - delay) / dur));
       const eased = 1 - Math.pow(1 - t, 3);

@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { profile } from "../data";
+import { createInk } from "../ink/fluid";
 import "./Issue.css";
 
-// The cover behind the cover. On first paint the issue presents its own
-// masthead — name, volume, dateline — then the sheet lifts away to reveal
-// the real cover underneath. Frames the whole page as a printed issue.
+// The cover behind the cover — now printed in living ink. Drops hit the sheet,
+// a real fluid simulation swirls them, then the ink pools into the masthead
+// glyphs and the type resolves on top like a fresh impression. The pointer
+// stirs the ink the whole time. Then the sheet lifts to reveal the cover.
+// Falls back to the classic typographic intro without WebGL2 / reduced motion.
 export default function Issue({ onDone }) {
   const root = useRef(null);
   const [gone, setGone] = useState(false);
@@ -19,7 +22,12 @@ export default function Issue({ onDone }) {
     const scrollY = window.scrollY;
     document.documentElement.classList.add("issue-locked");
 
+    // StrictMode re-runs this effect; anything async (fonts.ready, timeline
+    // callbacks) from a dead run must not touch state
+    let dead = false;
+
     const finish = () => {
+      if (dead) return;
       document.documentElement.classList.remove("issue-locked");
       window.scrollTo(0, scrollY);
       setGone(true);
@@ -32,49 +40,206 @@ export default function Issue({ onDone }) {
       return () => clearTimeout(t);
     }
 
+    // ── living ink (WebGL2) ──
+    // the canvas is created per effect run: StrictMode re-runs effects, and a
+    // canvas whose context was lost on cleanup can't host a second context
+    const canvas = document.createElement("canvas");
+    canvas.className = "issue__canvas";
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    root.current.prepend(canvas);
+    // this effect runs before Topbar's — apply the saved theme now so the
+    // ink reads the right palette (and the sheet doesn't flash day colors)
+    document.documentElement.setAttribute(
+      "data-theme",
+      localStorage.getItem("issue-theme") || "day",
+    );
+    const css = getComputedStyle(document.documentElement);
+    const ink = createInk(canvas, {
+      paper: css.getPropertyValue("--paper"),
+      ink: css.getPropertyValue("--ink"),
+      seal: css.getPropertyValue("--seal"),
+    });
+    if (!ink) canvas.remove();
+
+    let onMove = null;
+    let onDown = null;
+    let fontTimer = null;
+
     const ctx = gsap.context(() => {
-      // mastheads draws on, holds, then the whole sheet wipes up
       const lines = gsap.utils.toArray("[data-issue-line]");
       const rule = ".issue__rule-line";
 
-      gsap.set(lines, { yPercent: 110 });
+      if (!ink) {
+        // ── classic fallback: masthead draws on, holds, sheet wipes up ──
+        gsap.set(lines, { yPercent: 110 });
+        gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
+
+        const tl = gsap.timeline({ onComplete: finish });
+        tl.to(lines, {
+          yPercent: 0,
+          duration: 0.95,
+          ease: "expo.out",
+          stagger: 0.09,
+          delay: 0.1,
+        })
+          .to(rule, { scaleX: 1, duration: 0.8, ease: "expo.out" }, "-=0.7")
+          .to({}, { duration: 0.55 })
+          .to(
+            lines,
+            { yPercent: -120, duration: 0.8, ease: "power3.in", stagger: 0.05 },
+            "wipe",
+          )
+          .to(rule, { autoAlpha: 0, duration: 0.3 }, "wipe")
+          .to(
+            root.current,
+            { yPercent: -100, duration: 1.0, ease: "expo.inOut" },
+            "wipe+=0.15",
+          );
+        return;
+      }
+
+      // type starts invisible; the ink writes it first, print resolves after
+      gsap.set(".issue__name", { autoAlpha: 0, filter: "blur(14px)" });
+      gsap.set([".issue__kicker", ".issue__meta"], { autoAlpha: 0, y: 12 });
       gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
 
-      const tl = gsap.timeline({ onComplete: finish });
-      tl.to(lines, {
-        yPercent: 0,
-        duration: 0.95,
-        ease: "expo.out",
-        stagger: 0.09,
-        delay: 0.1,
-      })
-        .to(rule, { scaleX: 1, duration: 0.8, ease: "expo.out" }, "-=0.7")
-        // hold the masthead so it reads
-        .to({}, { duration: 0.55 })
-        // sheet lifts: lines drift up + out, then the panel itself clears
-        .to(
-          lines,
-          {
-            yPercent: -120,
-            duration: 0.8,
-            ease: "power3.in",
-            stagger: 0.05,
-          },
-          "wipe",
-        )
-        .to(rule, { autoAlpha: 0, duration: 0.3 }, "wipe")
-        .to(
-          root.current,
-          {
-            yPercent: -100,
-            duration: 1.0,
-            ease: "expo.inOut",
-          },
-          "wipe+=0.15",
-        );
+      ink.start();
+
+      // the pointer stirs the ink for the whole overture
+      let px = null;
+      let py = null;
+      onMove = (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = 1 - e.clientY / window.innerHeight;
+        if (px !== null) {
+          const dx = x - px;
+          const dy = y - py;
+          if (Math.abs(dx) + Math.abs(dy) > 0.0005) ink.pointer(x, y, dx, dy);
+        }
+        px = x;
+        py = y;
+      };
+      onDown = (e) => {
+        ink.drop(e.clientX / window.innerWidth, 1 - e.clientY / window.innerHeight, "ink");
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerdown", onDown);
+
+      // rasterize the real DOM glyphs → emitter points, so the ink pools
+      // exactly where the type will resolve
+      const buildGlyphs = () => {
+        const spans = root.current.querySelectorAll(".issue__mask > span");
+        const scale = 0.5;
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(window.innerWidth * scale));
+        c.height = Math.max(1, Math.round(window.innerHeight * scale));
+        const g = c.getContext("2d", { willReadFrequently: true });
+        g.fillStyle = "#000";
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        spans.forEach((span) => {
+          const r = span.getBoundingClientRect();
+          const cs = getComputedStyle(span);
+          g.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * scale}px ${cs.fontFamily}`;
+          if ("letterSpacing" in g) {
+            const ls = parseFloat(cs.letterSpacing);
+            g.letterSpacing = `${(Number.isNaN(ls) ? 0 : ls) * scale}px`;
+          }
+          g.fillText(span.textContent, (r.left + r.width / 2) * scale, (r.top + r.height / 2) * scale);
+        });
+        const data = g.getImageData(0, 0, c.width, c.height).data;
+        const pts = [];
+        const step = 2;
+        for (let y = 0; y < c.height; y += step) {
+          for (let x = 0; x < c.width; x += step) {
+            if (data[(y * c.width + x) * 4 + 3] > 100) {
+              pts.push(
+                (x + Math.random() * step) / c.width,
+                1 - (y + Math.random() * step) / c.height,
+              );
+            }
+          }
+        }
+        // shuffle point pairs so emission scatters across all letters at once
+        for (let i = pts.length / 2 - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const [a, b] = [pts[i * 2], pts[i * 2 + 1]];
+          pts[i * 2] = pts[j * 2];
+          pts[i * 2 + 1] = pts[j * 2 + 1];
+          pts[j * 2] = a;
+          pts[j * 2 + 1] = b;
+        }
+        ink.setGlyphs(new Float32Array(pts));
+      };
+
+      // ── the overture ──
+      const emit = { n: 0 };
+      const tl = gsap.timeline({ paused: true, onComplete: finish });
+
+      // drops hit the sheet — three ink, one seal-red. on small screens the
+      // name fills the middle, so the drops land clear of the text band
+      const wide = window.innerWidth >= 768;
+      const drops = wide
+        ? [[0.5, 0.6, "ink"], [0.36, 0.44, "ink"], [0.65, 0.52, "seal"], [0.52, 0.36, "ink"]]
+        : [[0.5, 0.82, "ink"], [0.3, 0.16, "ink"], [0.72, 0.2, "seal"], [0.62, 0.86, "ink"]];
+      tl.call(() => ink.drop(...drops[0]), [], 0.05)
+        .call(() => ink.drop(...drops[1]), [], 0.24)
+        .call(() => ink.drop(...drops[2]), [], 0.42)
+        .call(() => ink.drop(...drops[3]), [], 0.6)
+        // ink gathers into the name
+        .to(emit, {
+          n: 170,
+          duration: 0.6,
+          ease: "power2.in",
+          onUpdate: () => ink.setEmit(emit.n),
+        }, 0.85)
+        // the impression resolves: blur lifts, type sharpens over its own ink
+        .to(".issue__name", {
+          autoAlpha: 1,
+          filter: "blur(0px)",
+          duration: 1.2,
+          ease: "power2.inOut",
+        }, 1.7)
+        .to(".issue__kicker", { autoAlpha: 1, y: 0, duration: 0.7, ease: "expo.out" }, 2.05)
+        .to(rule, { scaleX: 1, duration: 0.8, ease: "expo.out" }, 2.15)
+        .to(".issue__meta", { autoAlpha: 1, y: 0, duration: 0.7, ease: "expo.out" }, 2.25)
+        // keep a trickle of ink refreshing the glyphs through the hold
+        .to(emit, {
+          n: 30,
+          duration: 0.6,
+          onUpdate: () => ink.setEmit(emit.n),
+        }, 2.6)
+        .to({}, { duration: 0.35 }, 3.0)
+        // the sheet lifts — ink still alive as it goes
+        .to(root.current, {
+          yPercent: -100,
+          duration: 1.05,
+          ease: "expo.inOut",
+        }, 3.35);
+
+      // wait for the display face so the glyph raster matches the real type
+      let started = false;
+      const begin = () => {
+        if (started || dead) return;
+        started = true;
+        buildGlyphs();
+        tl.play();
+      };
+      document.fonts?.ready?.then(begin);
+      fontTimer = setTimeout(begin, 1200);
     }, root);
 
-    return () => ctx.revert();
+    return () => {
+      dead = true;
+      if (onMove) window.removeEventListener("pointermove", onMove);
+      if (onDown) window.removeEventListener("pointerdown", onDown);
+      clearTimeout(fontTimer);
+      ctx.revert();
+      ink?.destroy();
+      canvas.remove();
+    };
   }, [onDone]);
 
   if (gone) return null;

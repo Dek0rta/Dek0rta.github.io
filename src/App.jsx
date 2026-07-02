@@ -79,9 +79,9 @@ export default function App() {
           });
         gsap.set(furniture, { opacity: 0 });
 
-        // hero assembles as the issue sheet lifts away (Issue holds ~1.6s
-        // before its wipe) — the cover is "developing" underneath as it clears
-        const tl = gsap.timeline({ delay: reduced ? 0.15 : 1.9 });
+        // hero assembles as the issue sheet lifts away (the ink overture
+        // wipes at ~3.35s) — the cover is "developing" underneath as it clears
+        const tl = gsap.timeline({ delay: reduced ? 0.15 : 3.3 });
         tl.to(lineInners, {
           yPercent: 0,
           duration: 1.1,

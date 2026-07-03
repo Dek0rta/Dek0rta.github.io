@@ -94,8 +94,8 @@ export default function Issue({ onDone }) {
           .to(rule, { autoAlpha: 0, duration: 0.3 }, "wipe")
           .to(
             root.current,
-            { yPercent: -100, duration: 1.0, ease: "expo.inOut" },
-            "wipe+=0.15",
+            { autoAlpha: 0, duration: 0.9, ease: "power2.inOut" },
+            "wipe+=0.2",
           );
         return;
       }
@@ -211,13 +211,49 @@ export default function Issue({ onDone }) {
           duration: 0.6,
           onUpdate: () => ink.setEmit(emit.n),
         }, 2.6)
-        .to({}, { duration: 0.35 }, 3.0)
-        // the sheet lifts — ink still alive as it goes
-        .to(root.current, {
-          yPercent: -100,
-          duration: 1.05,
-          ease: "expo.inOut",
-        }, 3.35);
+        // the impression melts back into ink — reverse of the resolve
+        .to(emit, {
+          n: 110,
+          duration: 0.45,
+          ease: "power2.in",
+          onUpdate: () => ink.setEmit(emit.n),
+        }, 3.0)
+        .to(".issue__name", {
+          autoAlpha: 0,
+          filter: "blur(12px)",
+          duration: 0.85,
+          ease: "power2.in",
+        }, 3.05)
+        .to([".issue__kicker", ".issue__meta"], {
+          autoAlpha: 0,
+          y: -10,
+          duration: 0.5,
+          ease: "power2.in",
+        }, 3.1)
+        .to(rule, { autoAlpha: 0, duration: 0.4 }, 3.1)
+        // emitters off so the dissolve isn't refilled from below
+        .to(emit, {
+          n: 0,
+          duration: 0.4,
+          onUpdate: () => ink.setEmit(emit.n),
+        }, 3.45)
+        // the sheet dissolves like wet paper — fluid drives the alpha, the
+        // cover develops through the holes. div bg goes transparent first
+        // (invisible switch: the canvas paints the same paper on top)
+        .call(() => {
+          if (!root.current) return;
+          root.current.style.background = "transparent";
+          root.current.style.pointerEvents = "none";
+          ink.breath();
+        }, [], 3.4)
+        .to({ t: 0 }, {
+          t: 1,
+          duration: 1.6,
+          ease: "power2.inOut",
+          onUpdate() {
+            ink.setDissolve(this.targets()[0].t);
+          },
+        }, 3.45);
 
       // wait for the display face so the glyph raster matches the real type
       let started = false;

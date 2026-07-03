@@ -151,18 +151,48 @@ void main() {
   frag = vec4(uAmount * s, 0.0, 0.0, 0.0);
 }`;
 
+// the sheet leaves by dissolving, not sliding: uDissolve sweeps 0→1 and the
+// paper eats away in fbm blotches (alpha holes reveal the live cover under
+// the canvas). Ink-dense pixels hold on longest — the tendrils go last — and
+// the dissolve edge soaks dark like wet paper before it vanishes.
 const FRAG_DISPLAY = `#version 300 es
 precision highp float;
 in vec2 vUv;
 uniform sampler2D uDye;
 uniform vec3 uPaper, uInk, uSeal;
+uniform float uDissolve, uAspect;
+uniform vec2 uSeed;
 out vec4 frag;
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x),
+             mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
+  return v;
+}
 void main() {
   vec2 d = texture(uDye, vUv).rg;
   float aSeal = 1.0 - exp(-d.g * 2.4);
   float aInk  = 1.0 - exp(-d.r * 2.8);
   vec3 col = mix(mix(uPaper, uSeal, aSeal), uInk, aInk);
-  frag = vec4(col, 1.0);
+  float alpha = 1.0;
+  if (uDissolve > 0.0) {
+    vec2 q = vec2(vUv.x * uAspect, vUv.y);
+    float n = fbm(q * 4.5 + uSeed);
+    float hold = (aInk + aSeal) * 0.32;            // ink outlives the paper
+    float x = uDissolve * 1.75 - (n + hold);       // overdriven so holds clear
+    float soak = smoothstep(-0.16, 0.0, x) * (1.0 - smoothstep(0.0, 0.12, x));
+    col = mix(col, uInk, soak * 0.3);
+    alpha = 1.0 - smoothstep(0.0, 0.12, x);
+  }
+  frag = vec4(col * alpha, alpha);                 // premultiplied
 }`;
 
 function parseColor(str) {
@@ -179,8 +209,9 @@ function parseColor(str) {
 export function createInk(canvas, colors) {
   let gl;
   try {
+    // alpha:true — the dissolve exit punches holes through to the live page
     gl = canvas.getContext("webgl2", {
-      alpha: false,
+      alpha: true,
       depth: false,
       stencil: false,
       antialias: false,
@@ -194,7 +225,6 @@ export function createInk(canvas, colors) {
   const ink = parseColor(colors.ink);
   const seal = parseColor(colors.seal);
 
-  // an alpha:false canvas composites black until first draw — paint paper now
   gl.clearColor(paper[0], paper[1], paper[2], 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -425,6 +455,9 @@ export function createInk(canvas, colors) {
     }
   };
 
+  let dissolve = 0;
+  const seed = [Math.random() * 100, Math.random() * 100];
+
   const render = () => {
     const pr = progs.display;
     gl.useProgram(pr.p);
@@ -433,6 +466,9 @@ export function createInk(canvas, colors) {
     gl.uniform3fv(pr.u.uPaper, paper);
     gl.uniform3fv(pr.u.uInk, ink);
     gl.uniform3fv(pr.u.uSeal, seal);
+    gl.uniform1f(pr.u.uDissolve, dissolve);
+    gl.uniform1f(pr.u.uAspect, aspect());
+    gl.uniform2f(pr.u.uSeed, seed[0], seed[1]);
     blit(null);
   };
 
@@ -482,6 +518,26 @@ export function createInk(canvas, colors) {
         const a = Math.random() * Math.PI * 2;
         const d = 0.02 + Math.random() * 0.05;
         splat(dye, x + Math.cos(a) * d, y + Math.sin(a) * d / aspect(), q[0] * 0.5, q[1] * 0.5, 0, 5e-5);
+      }
+    },
+
+    // 0→1: the sheet eats away to transparency (see FRAG_DISPLAY)
+    setDissolve(t) {
+      dissolve = t;
+    },
+
+    // one wide, slow stir so the ink is visibly alive while it dissolves
+    breath() {
+      for (let i = 0; i < 3; i++) {
+        splat(
+          velocity,
+          0.2 + Math.random() * 0.6,
+          0.2 + Math.random() * 0.6,
+          (Math.random() - 0.5) * 260,
+          (Math.random() - 0.5) * 260,
+          0,
+          8e-3,
+        );
       }
     },
 

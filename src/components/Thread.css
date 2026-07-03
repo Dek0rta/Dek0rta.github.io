@@ -31,6 +31,22 @@
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--seal) 60%, transparent));
 }
 
+/* thin tie from the knot to the folio number — draws in when the chapter
+   lands, stitching the thread onto the block it marks */
+.thread__tie {
+  stroke: var(--seal);
+  stroke-width: 1;
+  opacity: 0.18;
+  transform-box: fill-box;
+  transform: scaleX(0.25);
+  transform-origin: left center;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.thread__node.is-lit .thread__tie {
+  opacity: 0.55;
+  transform: scaleX(1);
+}
+
 /* nodes are mounted only after the doc settles — fade them in on the spot so
    they never appear to jump up from a shorter pre-settle layout. */
 .thread__node {

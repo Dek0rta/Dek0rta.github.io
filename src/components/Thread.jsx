@@ -43,11 +43,11 @@ export default function Thread() {
     const wrapLeft = wrap ? wrap.getBoundingClientRect().left : 64;
     const X = Math.max(20, wrapLeft - 26);
     setLaneX(X);
-    // two slow, incommensurate waves — the line meanders like a relaxed hand,
-    // never settling into a mechanical zigzag rhythm
-    const wave = (y) =>
-      4.5 * Math.sin((y / 680) * Math.PI * 2) +
-      2.2 * Math.sin((y / 263) * Math.PI * 2 + 1.2);
+    // ONE slow breath — a confident, nearly-straight stroke. the earlier
+    // layered waves read as a shaky hand, and dragging the line out to each
+    // folio bent it into drunken bulges. the line keeps its lane; knots and
+    // a thin tie do the fastening instead.
+    const wave = (y) => 5.5 * Math.sin((y / 820) * Math.PI * 2);
 
     // chapter anchors — the folio marker each knot fastens onto
     const FOLIO = {
@@ -63,23 +63,20 @@ export default function Thread() {
       const marker = sec.querySelector(FOLIO[c.id]) || sec;
       const r = marker.getBoundingClientRect();
       const y = Math.min(r.top + window.scrollY + r.height / 2, H - 60);
-      // the knot's stroke reaches to just shy of the folio number
-      const ax = Math.min(Math.max(X + 24, r.left - 20), X + 120);
-      return { ...c, y, ax };
+      return { ...c, y, folioLeft: r.left };
     })
       .filter(Boolean)
       .sort((p, q) => p.y - q.y);
 
-    // wave + excursion: between chapters the pen breathes on the lane; near a
-    // chapter it eases out of the wave and swings toward the folio in one
-    // long, calm arc — the window is wide so the reach never reads as a jolt.
-    const WIN = 210; // excursion half-window
+    // near a chapter the breath settles to the lane centre, so each knot is
+    // tied on a poised, vertical stretch of the stroke
+    const CALM = 140; // half-window of the settle
     const baseX = (y) => {
       for (const a of anchors) {
-        const t = Math.abs(y - a.y) / WIN;
+        const t = Math.abs(y - a.y) / CALM;
         if (t < 1) {
           const bump = 0.5 + 0.5 * Math.cos(t * Math.PI); // 1 at the anchor
-          return X + wave(y) * (1 - bump) + (a.ax - X) * bump;
+          return X + wave(y) * (1 - bump);
         }
       }
       return X + wave(y);
@@ -106,7 +103,7 @@ export default function Thread() {
 
     // knot events at every chapter + a rare flourish in the long stretches —
     // one graceful swash per gap at most, never a chain of doodles
-    const KNOT_R = 7.5;
+    const KNOT_R = 7;
     const KNOT_OPEN = 2.6;
     const knotDrop = (Math.PI * KNOT_R) / KNOT_OPEN; // half the vertical travel
     const events = anchors.map((a) => ({
@@ -168,13 +165,18 @@ export default function Thread() {
     }
     setPath(d);
 
-    // each node sits in the EYE of its knot — the thread is literally tied
-    // around the ring, fastening the line to the chapter block.
-    const list = anchors.map((a) => ({
-      ...a,
-      x: a.ax + KNOT_R, // loop centre = start x + dir·b
-      y: a.y,
-    }));
+    // each node sits in the EYE of its knot — the thread is tied around the
+    // ring — and a thin tie runs from the knot to the folio number, fastening
+    // the line to the chapter block without bending the stroke off its lane.
+    const list = anchors.map((a) => {
+      const x = X + KNOT_R; // loop centre: wave is calmed to the lane here
+      return {
+        ...a,
+        x,
+        y: a.y,
+        reach: Math.max(0, a.folioLeft - x - 12),
+      };
+    });
     setNodes(list);
   }, []);
 
@@ -312,6 +314,8 @@ export default function Thread() {
           data-thread-node={n.id}
           transform={`translate(${n.x} ${n.y})`}
         >
+          {/* thin tie fastening the knot to its folio number */}
+          <line className="thread__tie" x1="9" y1="0" x2={9 + n.reach} y2="0" />
           <circle className="thread__node-ring" r="5.5" />
           <circle className="thread__node-dot" r="2.4" />
         </g>

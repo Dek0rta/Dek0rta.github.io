@@ -99,7 +99,7 @@ export default function Projects() {
       <Tear source={projectsSource} filename="Projects.jsx">
         <div className="wrap">
           <div className="folio" data-reveal>
-            <span className="folio__no">01</span>
+            <span className="folio__no">02</span>
             <span className="folio__rule" />
             <span className="folio__label">What I shipped</span>
             <ProofMark k="shipped" />

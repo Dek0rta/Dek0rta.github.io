@@ -13,8 +13,9 @@ const CHAPTERS = [
   { id: "cover", no: "00", label: "Cover" },
   { id: "record", no: "01", label: "The Record" },
   { id: "shipped", no: "02", label: "Shipped" },
-  { id: "stack", no: "03", label: "The Stack" },
-  { id: "connect", no: "04", label: "End" },
+  { id: "path", no: "03", label: "The Path" },
+  { id: "stack", no: "04", label: "The Stack" },
+  { id: "connect", no: "05", label: "End" },
 ];
 
 export default function Thread() {
@@ -88,6 +89,7 @@ export default function Thread() {
       cover: ".hero__folio",
       record: ".record__folio",
       shipped: ".folio",
+      path: ".folio",
       stack: ".folio",
       connect: ".folio",
     };

@@ -63,6 +63,43 @@ export const projects = [
   },
 ];
 
+// THE PATH — the self-taught chronicle, printed year by year. There's no
+// diploma to scan, so the issue runs the record instead. Facts are Zakhar's
+// story — edit the years/entries freely, the layout adapts to any count.
+export const path = [
+  {
+    year: "2021",
+    title: "The first line",
+    body: "Python, self-taught from a bedroom in Bryansk. No course, no mentor — official docs, broken scripts, and enough stubbornness to keep going.",
+    artifact: '>>> print("hello, world")',
+  },
+  {
+    year: "2023",
+    title: "Code starts doing chores",
+    body: "Telegram bots take over real errands — parsing schedules, chasing deadlines. The first time something I wrote ran all night without me.",
+    artifact: "/start → bot online · 24/7",
+  },
+  {
+    year: "2025",
+    title: "Global Generation",
+    body: "Joined the team and took the SAT platform from idea to production: practice sets, adaptive scoring, progress tracking for real students.",
+    artifact: "git push origin main · sat.global-generations-edu.com",
+  },
+  {
+    year: "2026",
+    title: "700 people show up",
+    body: "SAT Portal passes 700 active students. Continuum turns textbook physics into things you can drag. Homework Bot reads photographed homework and files the deadlines itself.",
+    artifact: "◆ 700+ users · live",
+    live: true,
+  },
+  {
+    year: "next",
+    title: "Bryansk → US",
+    body: "Applying to CS programs in the States — looking for the place that'll let me build at full size.",
+    artifact: "Vol.02 — in preparation",
+  },
+];
+
 export const stack = [
   { name: "Python", note: "bots · LLM · OCR · automation", level: 88 },
   { name: "TypeScript", note: "React · Next.js · the web", level: 74 },

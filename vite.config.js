@@ -33,6 +33,7 @@ function proofData() {
     const sections = {
       record: ['src/components/Record.jsx', 'src/components/Record.css'],
       shipped: ['src/components/Projects.jsx', 'src/components/Projects.css'],
+      path: ['src/components/Path.jsx', 'src/components/Path.css'],
       stack: ['src/components/Stack.jsx', 'src/components/Stack.css'],
     }
     const out = { sections: {}, total: null }

@@ -9,6 +9,7 @@ import Cursor from "./components/Cursor";
 import Topbar from "./components/Topbar";
 import Hero from "./components/Hero";
 import Projects from "./components/Projects";
+import Path from "./components/Path";
 import Stack from "./components/Stack";
 import Colophon from "./components/Colophon";
 
@@ -212,6 +213,7 @@ export default function App() {
           <Record />
         </Suspense>
         <Projects />
+        <Path />
         <Stack />
       </main>
       <Colophon />

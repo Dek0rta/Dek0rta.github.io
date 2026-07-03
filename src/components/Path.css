@@ -1,0 +1,92 @@
+/* ── THE PATH — the self-taught chronicle, set like a ledger ── */
+
+.path__lead {
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  font-weight: 360;
+  font-style: italic;
+  max-width: 24ch;
+  margin-bottom: clamp(48px, 7vh, 88px);
+}
+
+.path__row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) 2fr;
+  gap: clamp(20px, 4vw, 64px);
+  align-items: start;
+  padding: clamp(32px, 5vh, 56px) 0;
+  border-top: 1px solid var(--hairline);
+}
+.path__row:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* the date stamp — a big numeral pressed into the page at a hand's angle.
+   resting tilt lives here (not in gsap) so the thump-in composes with it. */
+.path__year {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 380;
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.16;
+  rotate: var(--tilt, -2deg);
+  transform-origin: center;
+  user-select: none;
+}
+.path__row--live .path__year {
+  color: var(--seal);
+  opacity: 0.5;
+}
+
+/* screen readers get the year inside the heading; the stamp is decoration */
+.path__year-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.path__title {
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  font-weight: 440;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+
+.path__text {
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 52ch;
+  margin-bottom: 18px;
+}
+
+/* the era's artifact — one mono line, like a scrap of terminal glued in */
+.path__artifact {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.85;
+}
+.path__artifact.is-live {
+  color: var(--seal);
+  opacity: 1;
+}
+
+@media (max-width: 680px) {
+  .path__row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .path__year {
+    font-size: 2.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .path__year {
+    rotate: 0deg;
+  }
+}

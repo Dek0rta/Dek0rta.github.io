@@ -63,7 +63,7 @@ export default function Colophon() {
     <footer className="section colophon site-footer" id="connect">
       <div className="wrap">
         <div className="folio" data-reveal>
-          <span className="folio__no">03</span>
+          <span className="folio__no">05</span>
           <span className="folio__rule" />
           <span className="folio__label">Colophon</span>
         </div>

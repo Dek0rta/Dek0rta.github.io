@@ -7,7 +7,7 @@ export default function Stack() {
     <section className="section stack" id="stack">
       <div className="wrap">
         <div className="folio" data-reveal>
-          <span className="folio__no">02</span>
+          <span className="folio__no">04</span>
           <span className="folio__rule" />
           <span className="folio__label">The stack</span>
           <ProofMark k="stack" />

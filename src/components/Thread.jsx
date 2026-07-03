@@ -43,8 +43,11 @@ export default function Thread() {
     const wrapLeft = wrap ? wrap.getBoundingClientRect().left : 64;
     const X = Math.max(20, wrapLeft - 26);
     setLaneX(X);
-    const amp = 7; // gentle, even breath — a led pen, not a squiggle
-    const period = 360; // CONSTANT spacing → steady rhythm down the page
+    // two slow, incommensurate waves — the line meanders like a relaxed hand,
+    // never settling into a mechanical zigzag rhythm
+    const wave = (y) =>
+      4.5 * Math.sin((y / 680) * Math.PI * 2) +
+      2.2 * Math.sin((y / 263) * Math.PI * 2 + 1.2);
 
     // chapter anchors — the folio marker each knot fastens onto
     const FOLIO = {
@@ -68,28 +71,29 @@ export default function Thread() {
       .sort((p, q) => p.y - q.y);
 
     // wave + excursion: between chapters the pen breathes on the lane; near a
-    // chapter it eases out of the wave and reaches toward the folio.
-    const WIN = 130; // excursion half-window
+    // chapter it eases out of the wave and swings toward the folio in one
+    // long, calm arc — the window is wide so the reach never reads as a jolt.
+    const WIN = 210; // excursion half-window
     const baseX = (y) => {
-      const wave = amp * Math.sin((y / period) * Math.PI * 2);
       for (const a of anchors) {
         const t = Math.abs(y - a.y) / WIN;
         if (t < 1) {
           const bump = 0.5 + 0.5 * Math.cos(t * Math.PI); // 1 at the anchor
-          return X + wave * (1 - bump) + (a.ax - X) * bump;
+          return X + wave(y) * (1 - bump) + (a.ax - X) * bump;
         }
       }
-      return X + wave;
+      return X + wave(y);
     };
 
     // loops are prolate-cycloid arcs: the pen keeps travelling down while it
     // circles, so the stroke crosses itself like a handwritten loop — and both
     // ends leave heading straight down (no kink where it rejoins the wave).
-    // b = loop radius, vertical travel consumed = 2π·b/3.
-    const loopPts = (lx, ly, b, dir) => {
-      const a = b / 3;
+    // b = loop radius; `open` sets how much the loop stretches vertically —
+    // larger reads like a script ℓ, smaller like a tied-off knot.
+    const loopPts = (lx, ly, b, dir, open) => {
+      const a = b / open;
       const out = [];
-      const N = 30;
+      const N = 34;
       for (let k = 1; k <= N; k++) {
         const th = (k / N) * Math.PI * 2;
         out.push([
@@ -100,29 +104,28 @@ export default function Thread() {
       return out;
     };
 
-    // knot events at every chapter + flourish curls between them
-    const KNOT_R = 8;
-    const knotDrop = (Math.PI * KNOT_R) / 3; // half the loop's vertical travel
+    // knot events at every chapter + a rare flourish in the long stretches —
+    // one graceful swash per gap at most, never a chain of doodles
+    const KNOT_R = 7.5;
+    const KNOT_OPEN = 2.6;
+    const knotDrop = (Math.PI * KNOT_R) / KNOT_OPEN; // half the vertical travel
     const events = anchors.map((a) => ({
       y: a.y - knotDrop, // loop starts here so its eye centres on the folio
       b: KNOT_R,
       dir: 1, // wraps toward the number it fastens to
-      knot: a,
+      open: KNOT_OPEN,
     }));
     let side = -1;
     for (let i = 0; i < anchors.length - 1; i++) {
       const gap = anchors[i + 1].y - anchors[i].y;
-      if (gap < 620) continue;
-      // long stretches earn two curls, shorter ones a single flick
-      const spots = gap > 1800 ? [0.35, 0.68] : [0.5];
-      for (const f of spots) {
-        events.push({
-          y: anchors[i].y + gap * f,
-          b: 6,
-          dir: side,
-        });
-        side = -side;
-      }
+      if (gap < 760) continue;
+      events.push({
+        y: anchors[i].y + gap * 0.52,
+        b: 9.5,
+        dir: side,
+        open: 2, // open script-ℓ swash, not a tight curl
+      });
+      side = -side;
     }
     events.sort((p, q) => p.y - q.y);
 
@@ -147,10 +150,10 @@ export default function Thread() {
         const ly = Math.max(y - step, Math.min(ev.y, H - 60));
         const lx = xAt(ly);
         pts.push([lx, ly]);
-        const loop = loopPts(lx, ly, ev.b, ev.dir);
+        const loop = loopPts(lx, ly, ev.b, ev.dir, ev.open);
         pts.push(...loop);
         const endY = loop[loop.length - 1][1];
-        blend = { x: lx, from: endY, until: endY + 56 };
+        blend = { x: lx, from: endY, until: endY + 72 };
         y = endY + step;
         continue;
       }

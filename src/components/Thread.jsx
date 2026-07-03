@@ -26,10 +26,8 @@ export default function Thread() {
   const [laneX, setLaneX] = useState(56);
   const [ready, setReady] = useState(false); // only show nodes once layout settles
 
-  // build the thread down the WHOLE document: a calm sine wave that reaches out
-  // to each chapter's folio number and TIES A KNOT there (a self-crossing pen
-  // loop wrapped around the node), with smaller flourish curls in the long
-  // stretches between chapters. recomputed on resize / layout shift.
+  // build the serpentine path down the WHOLE document and pin each node to the
+  // vertical center of its real section. recomputed on resize / layout shift.
   const build = useCallback(() => {
     const H = Math.max(
       document.documentElement.scrollHeight,
@@ -43,13 +41,49 @@ export default function Thread() {
     const wrapLeft = wrap ? wrap.getBoundingClientRect().left : 64;
     const X = Math.max(20, wrapLeft - 26);
     setLaneX(X);
-    // ONE slow breath — a confident, nearly-straight stroke. the earlier
-    // layered waves read as a shaky hand, and dragging the line out to each
-    // folio bent it into drunken bulges. the line keeps its lane; knots and
-    // a thin tie do the fastening instead.
-    const wave = (y) => 5.5 * Math.sin((y / 820) * Math.PI * 2);
+    const amp = 7; // gentle, even breath — a led pen, not a squiggle
+    const period = 360; // CONSTANT spacing → steady rhythm down the page
+    const segs = Math.max(2, Math.round(H / period));
+    // even sinusoid: each segment is the same height, alternating side, so the
+    // wave reads as one calm hand-drawn stroke instead of tight loops up top.
+    let d = `M ${X} 0`;
+    for (let i = 1; i <= segs; i++) {
+      const y = (H / segs) * i;
+      const yMid = y - H / segs / 2;
+      const xMid = X + (i % 2 === 0 ? amp : -amp);
+      d += ` Q ${xMid.toFixed(1)} ${yMid.toFixed(1)} ${X} ${y.toFixed(1)}`;
+    }
+    setPath(d);
 
-    // chapter anchors — the folio marker each knot fastens onto
+    // measure the path so nodes can sit EXACTLY on the stroke (not beside it):
+    // sample it once, then for each node's y find the path's x at that height.
+    const probe = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path",
+    );
+    probe.setAttribute("d", d);
+    const total = probe.getTotalLength();
+    const SAMPLES = Math.max(60, Math.round(H / 24));
+    const pts = [];
+    for (let i = 0; i <= SAMPLES; i++) {
+      pts.push(probe.getPointAtLength((total * i) / SAMPLES));
+    }
+    const xOnLineAt = (y) => {
+      // nearest sample by y → the stroke's x there
+      let best = pts[0];
+      let bd = Infinity;
+      for (const pt of pts) {
+        const dd = Math.abs(pt.y - y);
+        if (dd < bd) {
+          bd = dd;
+          best = pt;
+        }
+      }
+      return best.x;
+    };
+
+    // node y = the chapter's FOLIO marker, so the thread pins to the number the
+    // reader sees ("00 Cover", "01 The Record"…) instead of floating mid-section.
     const FOLIO = {
       cover: ".hero__folio",
       record: ".record__folio",
@@ -57,126 +91,18 @@ export default function Thread() {
       stack: ".folio",
       connect: ".folio",
     };
-    const anchors = CHAPTERS.map((c) => {
+    const list = CHAPTERS.map((c) => {
       const sec = document.getElementById(c.id);
       if (!sec) return null;
       const marker = sec.querySelector(FOLIO[c.id]) || sec;
       const r = marker.getBoundingClientRect();
-      const y = Math.min(r.top + window.scrollY + r.height / 2, H - 60);
-      return { ...c, y, folioLeft: r.left };
-    })
-      .filter(Boolean)
-      .sort((p, q) => p.y - q.y);
-
-    // near a chapter the breath settles to the lane centre, so each knot is
-    // tied on a poised, vertical stretch of the stroke
-    const CALM = 140; // half-window of the settle
-    const baseX = (y) => {
-      for (const a of anchors) {
-        const t = Math.abs(y - a.y) / CALM;
-        if (t < 1) {
-          const bump = 0.5 + 0.5 * Math.cos(t * Math.PI); // 1 at the anchor
-          return X + wave(y) * (1 - bump);
-        }
-      }
-      return X + wave(y);
-    };
-
-    // loops are prolate-cycloid arcs: the pen keeps travelling down while it
-    // circles, so the stroke crosses itself like a handwritten loop — and both
-    // ends leave heading straight down (no kink where it rejoins the wave).
-    // b = loop radius; `open` sets how much the loop stretches vertically —
-    // larger reads like a script ℓ, smaller like a tied-off knot.
-    const loopPts = (lx, ly, b, dir, open) => {
-      const a = b / open;
-      const out = [];
-      const N = 34;
-      for (let k = 1; k <= N; k++) {
-        const th = (k / N) * Math.PI * 2;
-        out.push([
-          lx + dir * b * (1 - Math.cos(th)),
-          ly + a * th + b * Math.sin(th),
-        ]);
-      }
-      return out;
-    };
-
-    // knot events at every chapter + a rare flourish in the long stretches —
-    // one graceful swash per gap at most, never a chain of doodles
-    const KNOT_R = 7;
-    const KNOT_OPEN = 2.6;
-    const knotDrop = (Math.PI * KNOT_R) / KNOT_OPEN; // half the vertical travel
-    const events = anchors.map((a) => ({
-      y: a.y - knotDrop, // loop starts here so its eye centres on the folio
-      b: KNOT_R,
-      dir: 1, // wraps toward the number it fastens to
-      open: KNOT_OPEN,
-    }));
-    let side = -1;
-    for (let i = 0; i < anchors.length - 1; i++) {
-      const gap = anchors[i + 1].y - anchors[i].y;
-      if (gap < 760) continue;
-      events.push({
-        y: anchors[i].y + gap * 0.52,
-        b: 9.5,
-        dir: side,
-        open: 2, // open script-ℓ swash, not a tight curl
-      });
-      side = -side;
-    }
-    events.sort((p, q) => p.y - q.y);
-
-    // sample the whole stroke top to bottom, splicing loops in as they arrive
-    const pts = [[X, 0]];
-    const step = 4;
-    let y = step;
-    let ei = 0;
-    let blend = null; // eases the exit of a loop back onto the wave
-    const xAt = (yy) => {
-      let x = baseX(yy);
-      if (blend && yy < blend.until) {
-        const t = (yy - blend.from) / (blend.until - blend.from);
-        const s = t * t * (3 - 2 * t);
-        x = blend.x + (x - blend.x) * s;
-      }
-      return x;
-    };
-    while (y <= H) {
-      if (ei < events.length && events[ei].y <= y) {
-        const ev = events[ei++];
-        const ly = Math.max(y - step, Math.min(ev.y, H - 60));
-        const lx = xAt(ly);
-        pts.push([lx, ly]);
-        const loop = loopPts(lx, ly, ev.b, ev.dir, ev.open);
-        pts.push(...loop);
-        const endY = loop[loop.length - 1][1];
-        blend = { x: lx, from: endY, until: endY + 72 };
-        y = endY + step;
-        continue;
-      }
-      pts.push([xAt(y), y]);
-      y += step;
-    }
-    pts.push([xAt(H), H]);
-
-    let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
-    for (let i = 1; i < pts.length; i++) {
-      d += ` L ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`;
-    }
-    setPath(d);
-
-    // each node sits in the EYE of its knot — the thread is tied around the
-    // ring — and a thin tie runs from the knot to the folio number, fastening
-    // the line to the chapter block without bending the stroke off its lane.
-    const list = anchors.map((a) => {
-      const x = X + KNOT_R; // loop centre: wave is calmed to the lane here
-      return {
-        ...a,
-        x,
-        y: a.y,
-        reach: Math.max(0, a.folioLeft - x - 12),
-      };
-    });
+      const y = Math.min(r.top + window.scrollY + r.height / 2, H);
+      const nodeX = xOnLineAt(y);
+      // a short tie reaches from the stroke to the folio number, so the thread
+      // visibly hooks onto each chapter heading instead of running past it.
+      const reach = Math.max(0, r.left - nodeX - 6);
+      return { ...c, x: nodeX, y, reach };
+    }).filter(Boolean);
     setNodes(list);
   }, []);
 
@@ -303,8 +229,8 @@ export default function Thread() {
         strokeLinecap="round"
       />
 
-      {/* chapter nodes — each sits in the eye of the knot the thread ties at
-          its folio, so line and node are visibly fastened to the chapter.
+      {/* chapter nodes — quiet struck dots hugging the gutter. the chapter
+          number already lives in the folio beside it, so no duplicate label.
           held back (ready) until the doc reaches full height so they don't
           place against a short layout and jump upward when it settles. */}
       {ready && nodes.map((n) => (
@@ -314,10 +240,10 @@ export default function Thread() {
           data-thread-node={n.id}
           transform={`translate(${n.x} ${n.y})`}
         >
-          {/* thin tie fastening the knot to its folio number */}
-          <line className="thread__tie" x1="9" y1="0" x2={9 + n.reach} y2="0" />
-          <circle className="thread__node-ring" r="5.5" />
-          <circle className="thread__node-dot" r="2.4" />
+          {/* tie hooking the stroke onto the folio number */}
+          <line className="thread__tie" x1="0" y1="0" x2={n.reach} y2="0" />
+          <circle className="thread__node-ring" r="7" />
+          <circle className="thread__node-dot" r="2.6" />
         </g>
       ))}
 

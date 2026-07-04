@@ -3,7 +3,6 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { initInkblot } from "./inkblot";
 import Issue from "./components/Issue";
 import Thread from "./components/Thread";
 import Topbar from "./components/Topbar";
@@ -192,10 +191,7 @@ export default function App() {
 
     requestAnimationFrame(() => ScrollTrigger.refresh());
 
-    const offBlot = initInkblot();
-
     return () => {
-      offBlot();
       gsap.ticker.remove(raf);
       ctx.revert();
       lenis.destroy();

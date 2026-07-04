@@ -26,19 +26,21 @@
   gap: 14px;
   padding: clamp(28px, 4vh, 44px) clamp(8px, 2vw, 28px);
   position: relative;
-  will-change: transform;
 }
 .colo__link:not(:last-child) {
   border-right: 1px solid var(--hairline);
 }
+/* a faint ink wash soaks the cell on hover — quiet, no chasing the cursor */
 .colo__link::before {
   content: "";
   position: absolute;
   inset: 0;
   background: var(--seal);
   opacity: 0;
-  transition: opacity 0.4s;
-  z-index: -1;
+  transition: opacity 0.35s ease;
+}
+.colo__link:hover::before {
+  opacity: 0.06;
 }
 .colo__link-icon {
   width: 22px;
@@ -48,6 +50,12 @@
 }
 .colo__link:hover .colo__link-icon {
   transform: translateY(-3px);
+}
+.colo__link-handle {
+  transition: color 0.35s ease;
+}
+.colo__link:hover .colo__link-handle {
+  color: var(--seal);
 }
 .colo__link-name {
   font-family: var(--display);

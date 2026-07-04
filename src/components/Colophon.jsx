@@ -1,5 +1,3 @@
-import { useRef } from "react";
-import gsap from "gsap";
 import { socials, profile } from "../data";
 import { ProofTotal } from "./Proof";
 import "./Colophon.css";
@@ -24,31 +22,13 @@ const icons = {
   ),
 };
 
-function MagneticLink({ social }) {
-  const ref = useRef(null);
-  const fine = () =>
-    window.matchMedia("(pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const onMove = (e) => {
-    if (!fine()) return;
-    const el = ref.current;
-    const r = el.getBoundingClientRect();
-    const x = e.clientX - (r.left + r.width / 2);
-    const y = e.clientY - (r.top + r.height / 2);
-    gsap.to(el, { x: x * 0.25, y: y * 0.3, duration: 0.4, ease: "power3.out" });
-  };
-  const onLeave = () => gsap.to(ref.current, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.5)" });
-
+function ContactLink({ social }) {
   return (
     <a
-      ref={ref}
       className="colo__link"
       href={social.url}
       target="_blank"
       rel="noreferrer"
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
       data-cursor
     >
       <span className="colo__link-icon">{icons[social.icon]}</span>
@@ -75,7 +55,7 @@ export default function Colophon() {
 
         <div className="colo__links" data-reveal>
           {socials.map((s) => (
-            <MagneticLink key={s.name} social={s} />
+            <ContactLink key={s.name} social={s} />
           ))}
         </div>
 

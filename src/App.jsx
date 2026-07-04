@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Issue from "./components/Issue";
 import Thread from "./components/Thread";
-import Cursor from "./components/Cursor";
 import Topbar from "./components/Topbar";
 import Hero from "./components/Hero";
 import Projects from "./components/Projects";
@@ -204,7 +203,6 @@ export default function App() {
       <Issue />
       <Thread />
       <div className="grain" />
-      <Cursor />
       <Topbar />
 
       <main>

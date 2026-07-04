@@ -14,6 +14,58 @@ const Arrow = () => (
   </svg>
 );
 
+// screenshots set like figures in a printed feature: duotone ink until the
+// cursor passes over — then the plate takes its colour pass.
+function Plates({ project }) {
+  return (
+    <div className="plates">
+      {project.plates.map((pl, i) => (
+        <figure
+          className={`plate ${pl.wide ? "plate--wide" : ""}`}
+          key={pl.src}
+          data-reveal
+        >
+          <a
+            className="plate__frame"
+            href={project.live || project.url}
+            target="_blank"
+            rel="noreferrer"
+            data-cursor
+            aria-label={`${project.name} — open live site`}
+          >
+            <img src={pl.src} alt={pl.alt} loading="lazy" />
+          </a>
+          <figcaption className="plate__caption">
+            <span className="plate__fig">fig. {String(i + 1).padStart(2, "0")}</span>
+            {pl.caption}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
+// a bot has no screen to photograph — the issue prints a run transcript.
+function Transcript({ data }) {
+  return (
+    <figure className="plate plate--transcript" data-reveal>
+      <div className="transcript">
+        <div className="transcript__meta">{data.meta}</div>
+        {data.lines.map((l) => (
+          <div className="transcript__line" key={l.t + l.text}>
+            <span className="transcript__t">{l.t}</span>
+            <span>{l.text}</span>
+          </div>
+        ))}
+      </div>
+      <figcaption className="plate__caption">
+        <span className="plate__fig">fig. {data.fig || "01"}</span>
+        {data.caption}
+      </figcaption>
+    </figure>
+  );
+}
+
 function Entry({ project }) {
   const ref = useRef(null);
 
@@ -66,6 +118,17 @@ function Entry({ project }) {
         </div>
 
         <p className="entry__desc">{project.desc}</p>
+
+        {project.facts && (
+          <ul className="entry__facts">
+            {project.facts.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+        )}
+
+        {project.plates && <Plates project={project} />}
+        {project.transcript && <Transcript data={project.transcript} />}
 
         <div className="entry__foot">
           <div className="entry__tags">

@@ -27,12 +27,42 @@ export const stats = [
   { value: "since '21", label: "shipping real software" },
 ];
 
+// plates — screenshots tipped into the issue like printed figures.
+// src files live in assets/plates; captions are set in mono under each plate.
+import satApp from "./assets/plates/sat-app.webp";
+import satTest from "./assets/plates/sat-test.webp";
+import satAi from "./assets/plates/sat-ai.webp";
+
 export const projects = [
   {
     no: "01",
     name: "SAT Portal",
     org: "Global Generation",
     desc: "A full SAT-prep platform used by 700+ students. Practice sets, adaptive scoring, progress tracking — built and shipped with the Global Generation team.",
+    facts: [
+      "1,200+ questions in Bluebook format",
+      "full adaptive Digital SAT mock — 2h 14m, scored 400–1600",
+      "AI tutor with five teaching modes",
+      "interface in Russian — built for students across the CIS",
+    ],
+    plates: [
+      {
+        src: satApp,
+        alt: "SAT Portal app — practice modes screen with AI level assessment, smart practice and full-test options",
+        caption: "practice modes — AI diagnostics, adaptive drills, full mocks",
+        wide: true,
+      },
+      {
+        src: satTest,
+        alt: "SAT Portal exam simulation — Reading and Writing module in Bluebook-style interface with passage and answer choices",
+        caption: "exam simulation, faithful to the real Bluebook test",
+      },
+      {
+        src: satAi,
+        alt: "SAT Portal AI tutor chat solving a quadratic equation step by step",
+        caption: "the AI tutor, mid-explanation",
+      },
+    ],
     tags: ["React", "TypeScript", "Supabase"],
     metric: "700+ users · live",
     url: "https://sat.global-generations-edu.com/",
@@ -55,6 +85,18 @@ export const projects = [
     name: "Homework Bot",
     org: "Solo",
     desc: "A Telegram bot that reads a photo of your homework with Gemini + OCR, finds the deadlines, and drops them straight into Google Calendar. Built it because I needed it.",
+    // no screenshot — a bot has no screen. The issue prints a run transcript instead.
+    transcript: {
+      fig: "04", // figures run through the whole section, SAT holds 01–03
+      meta: "transcript — @homework_bot · one run",
+      lines: [
+        { t: "21:47", text: "photo received — algebra worksheet" },
+        { t: "21:47", text: "gemini + ocr: 6 tasks parsed, due date found" },
+        { t: "21:48", text: "→ google calendar: “Algebra №412–418” · fri" },
+        { t: "21:48", text: "reminder set — thu 18:00. done." },
+      ],
+      caption: "one photo in, deadlines filed — nothing else to tap",
+    },
     tags: ["Python", "Gemini", "OCR"],
     metric: "in use",
     url: "https://github.com/Dek0rta/Homework-bot",

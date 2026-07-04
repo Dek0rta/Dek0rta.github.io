@@ -1,5 +1,3 @@
-import { useRef } from "react";
-import gsap from "gsap";
 import { projects } from "../data";
 import Tear from "./Tear";
 import { ProofMark } from "./Proof";
@@ -75,32 +73,6 @@ function Transcript({ data }) {
 }
 
 function Entry({ project }) {
-  const ref = useRef(null);
-
-  const fine = () =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const onMove = (e) => {
-    if (!fine() || !project.featured) return;
-    const el = ref.current;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    gsap.to(el, {
-      rotateX: -py * 5,
-      rotateY: px * 6,
-      duration: 0.5,
-      ease: "power2.out",
-      transformPerspective: 1200,
-    });
-  };
-  const onLeave = () => {
-    if (!project.featured) return;
-    gsap.to(ref.current, { rotateX: 0, rotateY: 0, duration: 0.7, ease: "power3.out" });
-  };
-
   return (
     <article
       className={`entry ${project.featured ? "entry--featured" : ""}`}
@@ -111,12 +83,7 @@ function Entry({ project }) {
         <span className="entry__org">{project.org}</span>
       </div>
 
-      <div
-        className="entry__body"
-        ref={ref}
-        onPointerMove={onMove}
-        onPointerLeave={onLeave}
-      >
+      <div className="entry__body">
         <div className="entry__head">
           <h3 className="entry__name display">{project.name}</h3>
           <span className={`entry__metric ${project.live ? "is-live" : ""}`}>

@@ -33,10 +33,6 @@
   color: var(--muted);
 }
 
-.entry__body {
-  will-change: transform;
-}
-
 .entry__head {
   display: flex;
   align-items: baseline;

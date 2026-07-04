@@ -32,6 +32,7 @@ export const stats = [
 import satApp from "./assets/plates/sat-app.webp";
 import satTest from "./assets/plates/sat-test.webp";
 import satAi from "./assets/plates/sat-ai.webp";
+import continuumHero from "./assets/plates/continuum-hero.webp";
 
 export const projects = [
   {
@@ -77,13 +78,24 @@ export const projects = [
   },
   {
     no: "02",
-    name: "Continuum",
+    name: "Continuum Math",
     org: "Solo",
-    desc: "Physics and math simulations that run in the browser — turning textbook equations into things you can drag, tune, and watch evolve.",
+    desc: "A math exam-prep platform for the SAT and ЕГЭ — adaptive problem sets that track your level, theory right next to the practice, and an AI tutor. Designed, built and shipped solo.",
+    plates: [
+      {
+        src: continuumHero,
+        w: 1600,
+        h: 1000,
+        fig: "04",
+        alt: "Continuum Math landing — «Подготовься к экзамену. Умнее. Быстрее.» with adaptive practice, theory and AI tutor",
+        caption: "the front door — adaptive drills, theory in place, an AI tutor",
+        wide: true,
+      },
+    ],
     tags: ["TypeScript", "Next.js", "Supabase"],
     metric: "live",
-    url: "https://github.com/Dek0rta/Coninuum-Physics",
-    live: "https://coninuum-physics.vercel.app",
+    url: null,
+    live: "https://continuum-math.vercel.app",
     featured: false,
   },
   {
@@ -93,7 +105,7 @@ export const projects = [
     desc: "A Telegram bot that reads a photo of your homework with Gemini + OCR, finds the deadlines, and drops them straight into Google Calendar. Built it because I needed it.",
     // no screenshot — a bot has no screen. The issue prints a run transcript instead.
     transcript: {
-      fig: "04", // figures run through the whole section, SAT holds 01–03
+      fig: "05", // figures run through the whole section: SAT 01–03, Continuum 04
       meta: "transcript — @homework_bot · one run",
       lines: [
         { t: "21:47", text: "photo received — algebra worksheet" },
@@ -136,7 +148,7 @@ export const path = [
   {
     year: "2026",
     title: "700 people show up",
-    body: "SAT Portal passes 700 active students. Continuum turns textbook physics into things you can drag. Homework Bot reads photographed homework and files the deadlines itself.",
+    body: "SAT Portal passes 700 active students. Continuum Math serves adaptive exam prep with an AI tutor. Homework Bot reads photographed homework and files the deadlines itself.",
     artifact: "◆ 700+ users · live",
     live: true,
   },

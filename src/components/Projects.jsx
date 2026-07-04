@@ -42,7 +42,9 @@ function Plates({ project }) {
             />
           </a>
           <figcaption className="plate__caption">
-            <span className="plate__fig">fig. {String(i + 1).padStart(2, "0")}</span>
+            <span className="plate__fig">
+              fig. {pl.fig || String(i + 1).padStart(2, "0")}
+            </span>
             {pl.caption}
           </figcaption>
         </figure>

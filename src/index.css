@@ -61,13 +61,56 @@ body {
   transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── THE NIB — the cursor is the pen in your hand ──
+   a static calligraphy nib, tip at the hotspot; over anything pressable a
+   drop of cinnabar swells on the point. Pure CSS cursor images: no script,
+   no trailing, nothing chasing the pointer. SVG for Chrome/Firefox with a
+   PNG fallback for Safari (WebKit still won't take SVG cursors). */
+:root {
+  --nib-idle:
+    url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="translate(16 16) rotate(-45) translate(-12 -13)"%3E%3Cpath fill-rule="evenodd" d="M12 1 C 14.8 5.6, 18 9.6, 18 14.6 C 18 19.8, 15.4 23.4, 12 24.2 C 8.6 23.4, 6 19.8, 6 14.6 C 6 9.6, 9.2 5.6, 12 1 Z M11.55 5.2 h0.9 v8.1 h-0.9 Z M12 16.6 a2 2 0 1 1 0.001 0 Z" fill="%2312110f" stroke="rgba(251,248,241,0.65)" stroke-width="0.8"/%3E%3C/g%3E%3C/svg%3E')
+      7 7,
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADmUlEQVR4nOyWe0hTURzHz1176ZyVKydrtg1NCTcksszKNFEr7eHoMct/QmyVhfYgpCKC6EkJolFRWWm45Qwzt2VqojZNfJOPOVGbJkZOm1tmzMe87fwxWTZvLhf+4wfuH+f8zu93v+ec7zn34sA8gwPzzIKABQHzLgCPFWxqqErVarUol8crpS1Z2gGITmoEQX4CO4JgBUuKZGm3k1NOEgmEMR6P2+m1alUvjUYbBMhkXdjWkGISldYK/qeATx2t+xNPnZVUfqia6qPTXQGHzQaenh4/Nm/aqGQyGE8CtvjnIgh1ANhbADo67HPu/IWizMwsxoN7aQ15+VI3mbyAYY7jEASsW+cHdkbuaPHhrhYHh0RcBzaC6QG456bZ9k0YjYzXMvmyI0diU52dnU+JxNluMDyJoqC6phY+XDaLdS0/T7Kb5+t7mMPxVoFZgnkKoOGYTGYXXHapVL5SInmZECMQpBwU7O+fPra7pwfExgr9xVkiaWmpjAvsIQCyksUshHsOyRJlM8Q5kviYg9ZFwBW5k5ziWVxYlqv58nkLmAWL/jYgNfn2eLOyNaqx8SMVtpuaWxYjOJyXIPrAfTA56WMwGJzc3OhgYHBwKqeuvoFGciCw37ySVl69eVOLVR/ThGbycsXv4+KOB8IZmok5FN0tOLC3hOJIcdfrdWVvi0oOP3yU7mWOk8lk8PjhA1HELn4MVu1Z3YRURycJdLsl1dU1bDyBsL5UUXExODTyxlFhXFJQUOCoOW5aGZCdkxM+NNAbDOYqIGRbcHZ4WGiXZR+RQAT6Ib3ozJmkOthG8IjGwcHxtzyFonJZTW39ITBXAfCScWeuyOWwWVN9SpUK1NbWRao7lVHomG6torzyVnHxO5Jlnk6nA21tKm90+KvrjLWBDYieP21PSDztZemFoMDNE4uXLvkmlxfQjUbjHznHhHHtl69c3EciubRYq2nT13A5zSU6MeFEr2VfuaICn58vs/pyiE6vIyETONJMNW0SEBaxpzHAf83O+OPCttnmkMgOIygeNzJTHPsqtkLojn1N37UaIcWJcikt7X44dDsW6/38+ohEqhrYSwDE2cW1AjUY4jdtCEhKf5bBrzC5fchkuOnwo3YDDw77helKH52plk0mtAY85y2tbXylUuWh7lZ7azT97mQyRevry+tjsdwztkfw72Llz1mAGRQdXj42Nk6HhoN7Dpcda+Z2F/CvLPwVLwiYdwG/AAAA//8IfomiAAAABklEQVQDAByvUMhRjY7CAAAAAElFTkSuQmCC")
+      7 7,
+    auto;
+  --nib-point:
+    url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="translate(16 16) rotate(-45) translate(-12 -13)"%3E%3Cpath fill-rule="evenodd" d="M12 1 C 14.8 5.6, 18 9.6, 18 14.6 C 18 19.8, 15.4 23.4, 12 24.2 C 8.6 23.4, 6 19.8, 6 14.6 C 6 9.6, 9.2 5.6, 12 1 Z M11.55 5.2 h0.9 v8.1 h-0.9 Z M12 16.6 a2 2 0 1 1 0.001 0 Z" fill="%2312110f" stroke="rgba(251,248,241,0.65)" stroke-width="0.8"/%3E%3C/g%3E%3Ccircle cx="6.2" cy="6.2" r="3.1" fill="%23c4441e"/%3E%3C/svg%3E')
+      7 7,
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEBUlEQVR4nOyXbUyTVxTHz1152lJKUQqUdIW24S0bELKIMkSEMdrN4hzNnAX5Ygh2gyXoTBYy3bLF7EUzTYws0+jcpgvtKEvHaDtRdOjazvGiRIRSE01xjGUWBu3QpSDtXe+HklJLpVLli7+kSe8595z+73lOz/M8FCwzFCwzyy6A5rswFsSxgcncDxhJMWAOArhEYfz+2l/+7IZHxLwKYAbzIwBUCwgECKFoQEjsopDuqoTLgkfEPAGeE7/kvwEBir+DaWnwOARghISBNiE3JYTHIQBh3O6/wSPKlbz3OBtPT2VijKMgzCDfxe9iftqsmzJ4rFyvrR3FQz89YSY7O+tGelraCIfDGfeUpFf8YkkHnc0ZhCWC/A0mCTfB7Y54jnxfWblz1W7NuQOm3y7N+bncBBAJhZCamnJnXcFaM5/H+zp/fZ4GIfYYhEOAL6Ts7763++ypU028o182Xmlt0ybq9Kd5Xj+FEKxenQsbyzYMZGY9qyoukX4KIUIL6o2MtnpOOzrrcvF+0unjtm+vPhwTE7NTqWpOJG43xtDV3UM+WUKB4JO2VvWm7JycbSJRhgUWSdBJ6JkF//H5/Juk7FqtPlmt/qG+Si4/VCl/47b/3uFbt6C6WpGnalJqOzt1WRAOAYRkAf8MueaEJmUzT9WirquqDCyCVOTAwUOpHWcuaGx//bEeFsFTD9pw+ODn966ZB8v7+q6yybr/2sAKRFHp8ootR8DtznQ6ndGJiVwYGx+fi+m9fIVDZ0YIf/5Ra/p4376JYPmDNqGXVo3q15qa2kJyQi9VWyuG5VteP8+KYiU5HPYL7WfPbzt2/ES6189gMOCrY0eV0ldlVcFyL+puyI6KVpNu96Wrq1tIi4hY02kw7ikuLfvsTUVNQ1FR4bTX76kMNLe0SCbHRophqQJKXi5ulohLb/raIiMiwTHpUO7a1dBL1oiGbEzm/EFpMJjiunsub4WlCiBDJon/jEYkFMzZzBYL9PT0lllvmMvxjH2V4aJpf0fHObpvnN1uh6EhSwae+jthwdwQAsrvvrlev+OddN9eKCpcN7vi6ZX/6PWnuS6X676YtxQ11z/cu2cznR47EChnSE9E8ZzYih31b4/42i4ajLS2Nl3AHyfYHXY6mqXoC+UMSYBY+lpfft7zG+tqFUOLjaEzmHcxjbq7kD/4KA5A6YbN/f9O2BSsaNYHjY1HJKTbg7EmN3c0MpJthXAJIMTEJhix01lX8EJ+w4lvT8qMnm6f9DScP7LyTZAiEn7vGenTC+UKqQkDQf7nA4NDMrPZkmIdtmbYbLeTGAzWRE5O9qhAkHTyFansi2DxSxbgBeOp+JmZe1zScOSak7IHO3nYBTwsT96MnghYdgH/AwAA///Im9iKAAAABklEQVQDAGjjafjkDXC7AAAAAElFTkSuQmCC")
+      7 7,
+    pointer;
+}
+:root[data-theme="night"] {
+  --nib-idle:
+    url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="translate(16 16) rotate(-45) translate(-12 -13)"%3E%3Cpath fill-rule="evenodd" d="M12 1 C 14.8 5.6, 18 9.6, 18 14.6 C 18 19.8, 15.4 23.4, 12 24.2 C 8.6 23.4, 6 19.8, 6 14.6 C 6 9.6, 9.2 5.6, 12 1 Z M11.55 5.2 h0.9 v8.1 h-0.9 Z M12 16.6 a2 2 0 1 1 0.001 0 Z" fill="%23fbf8f1" stroke="rgba(18,17,15,0.55)" stroke-width="0.8"/%3E%3C/g%3E%3C/svg%3E')
+      7 7,
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADwklEQVR4nOyWW0wTWRiAT9thpgOlQIGlK112S7HTy7SU6baVsqwKZdHsrkT3Fte9vm/WFzUaH/TBRB+MLxqj8U5FIw8avCUiUm4SAa+gtpLW1giYYCvSVNrp1TnRGry0Vqnhhe9p5pz+f7/O/59/ygazDBvMMnMCcwKzLsBJtmmqWbTFsEBX4/X62LFYjE3T9BSzHAZphJVs889Vv21d/f9/68ORSNBqs92z3Rt2PJ14Oh6JRq41N59q93q9dvApBSoqVEv37N51nqrQvFpzezxgZGQUuFwPvH19/Tftdse+9o7u84zME/ARJC3B1FQAVFVVrpARUv6atRt6MzCMpVTI+UJhEZDJCKy2ZvGXhIxYIRLNq8vLycHvWm19IJ0CsOYUpVlW/Y2xBMlAIvv3HdqOcbFyQjo/G+6zWCwgLCoClQsMnxsM+vpwKPhtgA71jI+PT4B0CDCEZcT8Kp1OS5FKRS6KoqojjeZtWZmZGulLiTh8Pp9VX18nZrPZ9TiedclqtbpBGgRAbl4upvta+wt87ARTCi6Gyc2Nx7bjWbiGeEMCPhEtVVFA037T4NCt/okJ79iMBdxuT7CyUr9cqVDkwHsZQeQxZZA3HT++A8czyzEUzXZ73EAgELyKUavIAi7KLblk6ewKh8OTMxJg+uBJ8Tzhku/qTBL4C19ISHPRDFRqbjx6suXsmbHey1f2BoN0iUpFFsbjSFJRNjI2wrtxY/DMjAQgEok4Q1Ja2gAbLg7O5eZdaGtjGY3GdTt37Wm573poL1crfxWJihG4jyAIyMTxLzo6e7qYIzqaKHdKo/jcudaWru4e2/S1UCgEeDxe08aNm2/C+2iU9vj9gdfmCtM7n5lqF65MljslAThkHHZHMxxAccrKJMBoNCyXy+V1PB5Kfr9k6bbq6ip0ehxzMoBCLiOZS0Gi3CmVADJw9XoHjmM/LV60sCjeC1qKElNU+cqGZT/+/O8/f6s5nLfTOZ0uf7ul8zTspXfl/aC34ejY6O+HjjQ6p68Z9DrEVFsrfNeXQ7L52Xg0GkUT5UTAB2A2n7gdjSI/MA124q8/VpGpxPgDfi+HE/Yn2k+5BHGGhoYeDwxc7+diaLFaTUphtyfD3HSs32LpPchcRtIiAPH5fI8snd09zLiNMZNSUpCfn4Vh2Fufu9DaFmu92LppeNgxmChX0tdxKohEIr1er23QqEmiVPyVsqCwUOx7NuW+c+fuA6fLeeDw4aaDyeJnLDANAXPs8mHDwZpPTgbgmaXfF5ROgY9i7l/xnMCsCzwHAAD//wP7gswAAAAGSURBVAMAkyNNqclB95kAAAAASUVORK5CYII=")
+      7 7,
+    auto;
+  --nib-point:
+    url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="translate(16 16) rotate(-45) translate(-12 -13)"%3E%3Cpath fill-rule="evenodd" d="M12 1 C 14.8 5.6, 18 9.6, 18 14.6 C 18 19.8, 15.4 23.4, 12 24.2 C 8.6 23.4, 6 19.8, 6 14.6 C 6 9.6, 9.2 5.6, 12 1 Z M11.55 5.2 h0.9 v8.1 h-0.9 Z M12 16.6 a2 2 0 1 1 0.001 0 Z" fill="%23fbf8f1" stroke="rgba(18,17,15,0.55)" stroke-width="0.8"/%3E%3C/g%3E%3Ccircle cx="6.2" cy="6.2" r="3.1" fill="%23e8633a"/%3E%3C/svg%3E')
+      7 7,
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAELUlEQVR4nOyX+1NbRRTH9ybh3lzyEAI0qURsCCQkXEKaSFKCtFVA0LZgfc1UrVZ/cMY/wP5gnbH+Vmc6jq/Rau0rkXaK4wPbOhaB8JJKaGklrVAmMakCdtKkKRlsuHnc695qOoGSGJq0/NLPTGZ2z+45+83uObsJCywzLLDMLLsATnznyqs1gghCvwsA/QQCkDxoOkUD+q2V+07ZwB1i3g5EAL0TAeB1uPiDsMuHnwZAI8cvb9XwwB1ingC4eN3CCQgCClhsfim4GwIAQq9abBLNXtyeeQEA+XHhBIoG0deGPIhQKCyBXS7IMEh8x7PNWEqxWf3QLI7Z/DXNYKZsTWhsfPzi+MUJ5zX/NU+Uip5pa/u2OxAIOECaIAsNl7eaVtAYpWban/9Bqpreef8T3WrtzXGvzwcmJ6eA230pMDRkO+dwOPd29/T/AMVcBZkQEA+z7Xs+/dD61JPN0je2vzm4cdOGokfXr5XGxmmaBqP286Cr2zpyeviM+auvv/sALBF2skGSJK/rdNrm2odNRZwsTvSLvQd2Y1ysUqkoFdxQD0tEIhaD6jXGlUajoTESDq2dI8MDHo/HDzIhABIpU5bWVFXpdUS5OgdF0YpDZssuXna2VvGfiBhwt5DGxgYZi8VqxHFe19jYmBdkQADIyc3Bqh7SPyuRiIFSqRByMUxlMR/ejfNwrXKBCGZH9LrV+SQZrB+1/2rz+wPTaQvwen2h6mrD5nK1+j6mX6ZU5sJjULUeOfIejmdXYigq8Pq8QCQS3fTRVBD5XJRb1GXt7YtEIjNpCYB5cLXwfknTYw31cuYb/itCkYNmoQqL+ctv2o8fmx78+ZfPQiGyqKKCKIj5EYS6ZHJ6kn/27OixtAQwyOWyLHlxcQuTcDFwLjf3ZGcnYjKZtn/08Z72391/Oio15c9JpYU3HjgOhwOycfyBnt6BPliiU4lip/QcnzjR0d7XPzAebwuHw4DP57fu2LHzHNOnKNIXDM7NK2uYOyvq69ZtSRY7JQHMJeN0ONuYCyhGSYkcmEzGzSqVqoHPR4kNTY/vqq2tQeP9YGUAtaqMgE1RotgpHQHD8OmRHhzHnn5k/TpxLBf0Op1Mp6vc0tK86ZlXtr2sYbNvDedyuYPd1t7vmVxaLO6SfhFNTU89f+CQ2RVvMxqqOPV1dZLFFmcQCAU4RVFoopgcsAQslqPnKYqzESbY0ZdefIFIxSc4Fwyw2ZFgovGUjyCG3W6/Mjw8YuNiaKFGQyiYbE+GpfWwzWod3A+b0YwIYJidnf3L2ts/AK9bGt6U8vy8PB6GYbfMO9nRSXf81PH2xIRzNFGspK9hKkilUoPBoG/RaghlsWxVeX5BgWz27+veCxd+u+Ryu/YdPNi6P5l/2gLiEMGyy2MSjjnzmZk5pmbJ/3PKpIDb4t4/o3sCll3APwAAAP//GJ2+1QAAAAZJREFUAwDC5mmB6cmCqQAAAABJRU5ErkJggg==")
+      7 7,
+    pointer;
+}
+
+body {
+  cursor: var(--nib-idle);
+}
+a,
+button,
+[data-cursor],
+.plate__frame {
+  cursor: var(--nib-point);
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 button {
   font-family: inherit;
-  cursor: pointer;
 }
 ::selection {
   background: var(--seal);
@@ -162,6 +205,36 @@ main,
   html,
   body {
     transition: none;
+  }
+}
+
+/* ── THE BLOT — a press of the nib leaves a mark (see src/inkblot.js) ── */
+.inkblot {
+  position: fixed;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  background: var(--fg);
+  pointer-events: none;
+  z-index: 5000;
+  rotate: var(--blot-rot, 0deg);
+  animation: blot-soak 0.5s ease-out forwards;
+}
+@keyframes blot-soak {
+  0% {
+    opacity: 0;
+    scale: 0.35;
+  }
+  16% {
+    opacity: 0.6;
+  }
+  55% {
+    opacity: 0.35;
+    scale: 0.9;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
   }
 }
 

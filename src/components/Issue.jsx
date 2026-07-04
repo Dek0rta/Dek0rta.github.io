@@ -51,15 +51,19 @@ export default function Issue({ onDone }) {
     root.current.prepend(canvas);
     // this effect runs before Topbar's — apply the saved theme now so the
     // ink reads the right palette (and the sheet doesn't flash day colors)
-    document.documentElement.setAttribute(
-      "data-theme",
-      localStorage.getItem("issue-theme") || "day",
-    );
+    const theme = localStorage.getItem("issue-theme") || "day";
+    document.documentElement.setAttribute("data-theme", theme);
+    // on a cold first load this effect can run before the stylesheet lands —
+    // getComputedStyle then returns "" and the ink would paint pitch black.
+    // Fall back to the printed tokens for the active theme.
     const css = getComputedStyle(document.documentElement);
+    const night = theme === "night";
+    const tok = (name, day, dark) =>
+      css.getPropertyValue(name).trim() || (night ? dark : day);
     const ink = createInk(canvas, {
-      paper: css.getPropertyValue("--paper"),
-      ink: css.getPropertyValue("--ink"),
-      seal: css.getPropertyValue("--seal"),
+      paper: tok("--paper", "#fbf8f1", "#100f0d"),
+      ink: tok("--ink", "#12110f", "#fbf8f1"),
+      seal: tok("--seal", "#c4441e", "#e8633a"),
     });
     if (!ink) canvas.remove();
 

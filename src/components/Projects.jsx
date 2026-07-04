@@ -33,7 +33,13 @@ function Plates({ project }) {
             data-cursor
             aria-label={`${project.name} — open live site`}
           >
-            <img src={pl.src} alt={pl.alt} loading="lazy" />
+            <img
+              src={pl.src}
+              alt={pl.alt}
+              width={pl.w}
+              height={pl.h}
+              loading="lazy"
+            />
           </a>
           <figcaption className="plate__caption">
             <span className="plate__fig">fig. {String(i + 1).padStart(2, "0")}</span>

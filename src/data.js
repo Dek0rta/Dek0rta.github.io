@@ -48,17 +48,23 @@ export const projects = [
     plates: [
       {
         src: satApp,
+        w: 1600,
+        h: 781,
         alt: "SAT Portal app — practice modes screen with AI level assessment, smart practice and full-test options",
         caption: "practice modes — AI diagnostics, adaptive drills, full mocks",
         wide: true,
       },
       {
         src: satTest,
+        w: 1200,
+        h: 888,
         alt: "SAT Portal exam simulation — Reading and Writing module in Bluebook-style interface with passage and answer choices",
         caption: "exam simulation, faithful to the real Bluebook test",
       },
       {
         src: satAi,
+        w: 1200,
+        h: 819,
         alt: "SAT Portal AI tutor chat solving a quadratic equation step by step",
         caption: "the AI tutor, mid-explanation",
       },

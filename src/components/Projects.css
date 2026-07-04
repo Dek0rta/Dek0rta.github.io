@@ -202,6 +202,7 @@
 }
 .plate__frame img {
   width: 100%;
+  height: auto; /* the width/height attrs only reserve the aspect ratio */
   filter: grayscale(1) sepia(0.16) contrast(1.03);
   transform: scale(1.005);
   transition: filter 0.55s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);

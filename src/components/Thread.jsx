@@ -30,10 +30,14 @@ export default function Thread() {
   // build the serpentine path down the WHOLE document and pin each node to the
   // vertical center of its real section. recomputed on resize / layout shift.
   const build = useCallback(() => {
-    const H = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-    );
+    // measure the CONTENT, not scrollHeight: the absolute svg is itself part of
+    // scrollHeight, so measuring it back ratchets the page taller forever (any
+    // transient layout spike gets frozen in as scrollable emptiness). The
+    // footer's bottom edge is where the issue actually ends.
+    const footer = document.querySelector(".site-footer, footer");
+    const H = footer
+      ? Math.round(footer.getBoundingClientRect().bottom + window.scrollY)
+      : document.documentElement.scrollHeight;
     setDocH(H);
 
     // sit the lane just outside the content column so the thread hugs the text
@@ -114,6 +118,9 @@ export default function Thread() {
     // resize. NOT via ResizeObserver(body) — the absolute SVG can feed back into
     // scrollHeight and loop. discrete rebuilds only.
     window.addEventListener("resize", build);
+    // plates and portraits shift the layout as they arrive — remeasure once
+    // every image is in (no-op if the load event already fired)
+    window.addEventListener("load", build);
     const t1 = setTimeout(build, 600);
     // after the Issue sheet lifts + hero settles the document is at its real
     // height. rebuild THEN reveal the nodes — so they fade in already at their
@@ -129,6 +136,7 @@ export default function Thread() {
     }
     return () => {
       window.removeEventListener("resize", build);
+      window.removeEventListener("load", build);
       clearTimeout(t1);
       clearTimeout(t2);
     };

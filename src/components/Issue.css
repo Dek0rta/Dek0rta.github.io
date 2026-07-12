@@ -86,9 +86,33 @@ html.issue-locked body {
   color: var(--muted);
 }
 
+/* skip hint — quiet, at the foot of the sheet. any interaction cuts the
+   overture (see Issue.jsx); this just tells the visitor they're not trapped. */
+.issue__skip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 4vh, 40px);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  animation: issue-skip-in 0.6s ease 1.2s forwards;
+  pointer-events: none;
+}
+@keyframes issue-skip-in {
+  to { opacity: 0.55; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .issue {
     transition: none;
+  }
+  .issue__skip {
+    display: none;
   }
   .issue__kicker > span,
   .issue__meta > span,

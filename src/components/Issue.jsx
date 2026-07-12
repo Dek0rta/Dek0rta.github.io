@@ -17,6 +17,9 @@ export default function Issue({ onDone }) {
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    // the overture is a first-impression, not a toll gate: play it once per
+    // session. repeat loads (and back-navigation) skip straight to the cover.
+    const seen = sessionStorage.getItem("issue-seen") === "1";
 
     // hold the page still while the sheet is up — no scrolling behind it
     const scrollY = window.scrollY;
@@ -28,15 +31,16 @@ export default function Issue({ onDone }) {
 
     const finish = () => {
       if (dead) return;
+      sessionStorage.setItem("issue-seen", "1");
       document.documentElement.classList.remove("issue-locked");
       window.scrollTo(0, scrollY);
       setGone(true);
       onDone?.();
     };
 
-    if (reduced) {
+    if (reduced || seen) {
       // no theatre — hand off to the cover immediately
-      const t = setTimeout(finish, 200);
+      const t = setTimeout(finish, reduced ? 200 : 0);
       return () => clearTimeout(t);
     }
 
@@ -71,6 +75,27 @@ export default function Issue({ onDone }) {
     let onDown = null;
     let fontTimer = null;
 
+    // ── skip: the overture is beautiful but must never trap the visitor.
+    // any intent to interact — a click, a key, a scroll, a touch — cuts to the
+    // cover. `activeTl` points at whichever timeline is running so we can kill
+    // it before handing off.
+    let activeTl = null;
+    let onSkip = null;
+    const skip = () => {
+      if (dead) return;
+      activeTl?.kill();
+      finish();
+    };
+    onSkip = (e) => {
+      // ignore modifier-only keys so a11y shortcuts don't count as a skip
+      if (e.type === "keydown" && (e.metaKey || e.ctrlKey || e.altKey)) return;
+      skip();
+    };
+    window.addEventListener("pointerdown", onSkip);
+    window.addEventListener("keydown", onSkip);
+    window.addEventListener("wheel", onSkip, { passive: true });
+    window.addEventListener("touchstart", onSkip, { passive: true });
+
     const ctx = gsap.context(() => {
       const lines = gsap.utils.toArray("[data-issue-line]");
       const rule = ".issue__rule-line";
@@ -81,6 +106,7 @@ export default function Issue({ onDone }) {
         gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
 
         const tl = gsap.timeline({ onComplete: finish });
+        activeTl = tl;
         tl.to(lines, {
           yPercent: 0,
           duration: 0.95,
@@ -181,6 +207,7 @@ export default function Issue({ onDone }) {
       // ── the overture ──
       const emit = { n: 0 };
       const tl = gsap.timeline({ paused: true, onComplete: finish });
+      activeTl = tl;
 
       // drops hit the sheet — three ink, one seal-red. on small screens the
       // name fills the middle, so the drops land clear of the text band
@@ -275,6 +302,12 @@ export default function Issue({ onDone }) {
       dead = true;
       if (onMove) window.removeEventListener("pointermove", onMove);
       if (onDown) window.removeEventListener("pointerdown", onDown);
+      if (onSkip) {
+        window.removeEventListener("pointerdown", onSkip);
+        window.removeEventListener("keydown", onSkip);
+        window.removeEventListener("wheel", onSkip);
+        window.removeEventListener("touchstart", onSkip);
+      }
       clearTimeout(fontTimer);
       ctx.revert();
       ink?.destroy();
@@ -310,6 +343,7 @@ export default function Issue({ onDone }) {
           </span>
         </p>
       </div>
+      <p className="issue__skip">tap / scroll to skip</p>
     </div>
   );
 }

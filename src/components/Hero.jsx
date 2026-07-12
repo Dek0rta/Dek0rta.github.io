@@ -5,10 +5,11 @@ import "./Hero.css";
 
 export default function Hero() {
   const [count, setCount] = useState(0);
-  const [bump, setBump] = useState(false); // pulses the seal when a "new user" lands
   const seal = useRef(null);
 
-  // count 0 → liveUsers once, paced with an ease-out
+  // count 0 → liveUsers once, paced with an ease-out. this is the ONE true
+  // figure — the real SAT Portal user count. no invented tick-up: a portfolio
+  // that sells "no filler, just the record" can't fake a live number.
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
@@ -18,7 +19,7 @@ export default function Hero() {
     let raf;
     const start = performance.now();
     const dur = 1800;
-    const delay = 4000; // wait out the ink overture + let the name land first
+    const delay = 1200; // let the cover land, then run the count
     const tick = (now) => {
       const t = Math.min(1, Math.max(0, (now - start - delay) / dur));
       const eased = 1 - Math.pow(1 - t, 3);
@@ -27,30 +28,6 @@ export default function Hero() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
-
-  // after the count settles, tick up like a live dashboard — someone just
-  // signed up. real-feeling cadence (4–10s), a +1/+2 nudge, a brief pulse.
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-    let timer;
-    let clearBump;
-    const schedule = () => {
-      const wait = 4000 + Math.random() * 6000;
-      timer = setTimeout(() => {
-        setCount((c) => c + (Math.random() < 0.8 ? 1 : 2));
-        setBump(true);
-        clearBump = setTimeout(() => setBump(false), 600);
-        schedule();
-      }, wait);
-    };
-    const kickoff = setTimeout(schedule, 5000); // start after the 0→liveUsers run
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(kickoff);
-      clearTimeout(clearBump);
-    };
   }, []);
 
   return (
@@ -82,14 +59,11 @@ export default function Hero() {
           <div className="hero__foot">
           <div className="hero__seal" ref={seal} data-hero="6">
             <span className="hero__seal-mark">◆</span>
-            <span className={`hero__seal-num${bump ? " is-bump" : ""}`}>
+            <span className="hero__seal-num">
               {count}+
             </span>
             <span className="hero__seal-label">
               {headline.liveLabel}
-              <em className="hero__live">
-                <span className="hero__live-dot" /> live
-              </em>
             </span>
             <span className="hero__pip" aria-hidden="true">
               <span className="hero__pip-dot" />

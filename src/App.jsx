@@ -79,9 +79,10 @@ export default function App() {
           });
         gsap.set(furniture, { opacity: 0 });
 
-        // hero assembles as the issue sheet dissolves (holes open from
-        // ~3.45s) — the cover is "developing" through them as it clears
-        const tl = gsap.timeline({ delay: reduced ? 0.15 : 3.3 });
+        // hero assembles as the issue sheet lifts. the overture is now short
+        // (first visit only, skippable — see Issue.jsx), so the cover reveals
+        // right behind it instead of waiting out a long theatre.
+        const tl = gsap.timeline({ delay: reduced ? 0.15 : 1.4 });
         tl.to(lineInners, {
           yPercent: 0,
           duration: 1.1,

@@ -62,12 +62,13 @@
 .entry__metric.is-live {
   color: var(--seal);
 }
+/* a static seal mark — "live" is stated in the metric text; one authoritative
+   live indicator (the hero seal) is enough, no competing perpetual pulses. */
 .entry__dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--seal);
-  animation: pulse 2s ease-out infinite;
 }
 
 .entry__desc {

@@ -26,11 +26,15 @@ export default function Issue({ onDone }) {
     document.documentElement.classList.add("issue-locked");
 
     // StrictMode re-runs this effect; anything async (fonts.ready, timeline
-    // callbacks) from a dead run must not touch state
+    // callbacks) from a dead run must not touch state. `done` also latches on
+    // an early skip so a pending fonts.ready/timer can't fire buildGlyphs()
+    // against a torn-down root.
     let dead = false;
+    let done = false;
 
     const finish = () => {
-      if (dead) return;
+      if (dead || done) return;
+      done = true;
       sessionStorage.setItem("issue-seen", "1");
       document.documentElement.classList.remove("issue-locked");
       window.scrollTo(0, scrollY);
@@ -160,6 +164,7 @@ export default function Issue({ onDone }) {
       // rasterize the real DOM glyphs → emitter points, so the ink pools
       // exactly where the type will resolve
       const buildGlyphs = () => {
+        if (!root.current) return;
         const spans = root.current.querySelectorAll(".issue__mask > span");
         const scale = 0.5;
         const c = document.createElement("canvas");
@@ -289,7 +294,7 @@ export default function Issue({ onDone }) {
       // wait for the display face so the glyph raster matches the real type
       let started = false;
       const begin = () => {
-        if (started || dead) return;
+        if (started || dead || done) return;
         started = true;
         buildGlyphs();
         tl.play();

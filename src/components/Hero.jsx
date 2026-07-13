@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { profile, headline } from "../data";
+import { usePick, useT } from "../i18n.jsx";
 import portrait from "../assets/portrait.png";
 import "./Hero.css";
 
 export default function Hero() {
   const [count, setCount] = useState(0);
   const seal = useRef(null);
+  const pick = usePick();
+  const t = useT();
 
   // count 0 → liveUsers once, paced with an ease-out. this is the ONE true
   // figure — the real SAT Portal user count. no invented tick-up: a portfolio
@@ -37,21 +40,21 @@ export default function Hero() {
         <div className="hero__lead">
           <p className="hero__folio" data-hero="1">
             <span className="hero__folio-no">00</span>
-            <span className="hero__folio-label">Cover</span>
+            <span className="hero__folio-label">{t("hero.folio")}</span>
           </p>
 
           <h1 className="hero__title display">
             <span className="hero__line" data-hero="2">
-              <span className="hero__line-inner">Self-taught</span>
+              <span className="hero__line-inner">{t("hero.line1")}</span>
             </span>
             <span className="hero__line" data-hero="3">
-              <span className="hero__line-inner">software engineer</span>
+              <span className="hero__line-inner">{t("hero.line2")}</span>
             </span>
             <span className="hero__line hero__line--em" data-hero="4">
-              <span className="hero__line-inner">building things people</span>
+              <span className="hero__line-inner">{t("hero.line3")}</span>
             </span>
             <span className="hero__line hero__line--em" data-hero="5">
-              <span className="hero__line-inner">actually use.</span>
+              <span className="hero__line-inner">{t("hero.line4")}</span>
             </span>
           </h1>
 
@@ -63,7 +66,7 @@ export default function Hero() {
               {count}+
             </span>
             <span className="hero__seal-label">
-              {headline.liveLabel}
+              {pick(headline.liveLabel)}
             </span>
             <span className="hero__pip" aria-hidden="true">
               <span className="hero__pip-dot" />
@@ -71,9 +74,9 @@ export default function Hero() {
           </div>
 
           <p className="hero__sig" data-hero="8">
-            {profile.name}, <em>{profile.location}</em>
+            {pick(profile.name)}, <em>{pick(profile.location)}</em>
             <br />
-            shipping since {profile.shippingSince}.
+            {t("hero.since", profile.shippingSince)}
           </p>
           </div>
         </div>
@@ -85,7 +88,7 @@ export default function Hero() {
           <span className="hero__diamond" aria-hidden="true" />
           <span className="hero__rule" aria-hidden="true" />
           <div className="hero__portrait">
-            <img src={portrait} alt={`Portrait of ${profile.name}`} />
+            <img src={portrait} alt={t("hero.portrait", pick(profile.name))} />
           </div>
         </figure>
       </div>

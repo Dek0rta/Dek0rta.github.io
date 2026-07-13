@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { profile } from "../data";
 import { burnTheme } from "../burn";
+import { useLang, usePick, useT } from "../i18n.jsx";
 import "./Topbar.css";
 
 export default function Topbar() {
   const [theme, setTheme] = useState("day");
+  const { lang, setLang } = useLang();
+  const pick = usePick();
+  const t = useT();
 
   useEffect(() => {
     const saved = localStorage.getItem("issue-theme") || "day";
@@ -28,7 +32,7 @@ export default function Topbar() {
     <header className="topbar">
       <div className="topbar__inner wrap">
         <a href="#cover" className="topbar__name" data-cursor>
-          {profile.name}
+          {pick(profile.name)}
         </a>
 
         <div className="topbar__right">
@@ -37,13 +41,23 @@ export default function Topbar() {
           </span>
           <button
             className="topbar__toggle"
+            onClick={() => setLang(lang === "en" ? "ru" : "en")}
+            data-cursor
+            aria-label={t("topbar.lang")}
+          >
+            <span className={lang === "en" ? "is-on" : ""}>EN</span>
+            <span className="topbar__slash">/</span>
+            <span className={lang === "ru" ? "is-on" : ""}>RU</span>
+          </button>
+          <button
+            className="topbar__toggle"
             onClick={toggle}
             data-cursor
-            aria-label={`Switch to ${theme === "day" ? "night" : "day"} mode`}
+            aria-label={t("topbar.theme", theme === "day" ? "night" : "day")}
           >
-            <span className={theme === "day" ? "is-on" : ""}>Day</span>
+            <span className={theme === "day" ? "is-on" : ""}>{t("topbar.day")}</span>
             <span className="topbar__slash">/</span>
-            <span className={theme === "night" ? "is-on" : ""}>Night</span>
+            <span className={theme === "night" ? "is-on" : ""}>{t("topbar.night")}</span>
           </button>
         </div>
       </div>

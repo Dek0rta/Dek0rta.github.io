@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import snapshot from "../github.json";
 import { profile } from "../data";
+import { usePick, useT } from "../i18n.jsx";
 import { ProofMark } from "./Proof";
 import "./Record.css";
 
@@ -39,6 +40,12 @@ async function fetchLive(user) {
 }
 
 export default function Record() {
+  const pick = usePick();
+  const t = useT();
+  // the WebGL effect closes over paintRead once; the ref keeps the read-out
+  // chip speaking the current language without rebuilding the field.
+  const tRef = useRef(t);
+  tRef.current = t;
   const mountRef = useRef(null);
   const readRef = useRef(null); // the hover read-out chip
   const layoutRef = useRef(null); // {layout, weeks, inset} for hover + axis
@@ -106,10 +113,6 @@ export default function Record() {
     // inset hard enough that the largest dots (busy days swell ~16px) clear the
     // plate edges — top/bottom rows were getting clipped to half-circles.
     const INSET = 0.86; // fraction of [-1,1] the lattice occupies
-    const MONTHS = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
     let lastMonth = -1;
     for (let i = 0; i < N; i++) {
       const col = Math.floor(i / ROWS);
@@ -139,7 +142,9 @@ export default function Record() {
       const m = new Date(days[i].date + "T00:00:00").getMonth();
       if (m !== lastMonth) {
         lastMonth = m;
-        monthTicks.push({ label: MONTHS[m], x: x * 0.5 + 0.5 });
+        // store the month index — the label is set at render so a language
+        // switch reprints the axis without rebuilding the field
+        monthTicks.push({ m, x: x * 0.5 + 0.5 });
       }
     }
     layoutRef.current = { layout, weeks, inset: INSET };
@@ -336,14 +341,8 @@ export default function Record() {
     ro.observe(mount);
 
     // day name for the read-out — level is 0..4 (GitHub buckets), not a count,
-    // so name the band rather than fake a number.
-    const LEVEL_NAME = [
-      "no commits",
-      "a light day",
-      "a steady day",
-      "a busy day",
-      "a heavy day",
-    ];
+    // so name the band rather than fake a number. names + locale come through
+    // tRef so the chip follows the live language.
     const readEl = readRef.current;
     let hoverIdx = -1;
 
@@ -355,16 +354,15 @@ export default function Record() {
       readEl.style.left = `${px}px`;
       readEl.style.top = `${py}px`;
       const d = new Date(L.date + "T00:00:00");
-      const ds = d.toLocaleDateString("en-US", {
+      const ds = d.toLocaleDateString(tRef.current("record.locale"), {
         weekday: "short",
         month: "short",
         day: "numeric",
       });
       readEl.querySelector(".record__read-date").textContent = ds;
       const lv = readEl.querySelector(".record__read-level");
-      lv.innerHTML = L.level >= 3
-        ? `<em>${LEVEL_NAME[L.level]}</em>`
-        : LEVEL_NAME[L.level];
+      const levelName = tRef.current("record.levels")[L.level];
+      lv.innerHTML = L.level >= 3 ? `<em>${levelName}</em>` : levelName;
       readEl.classList.add("is-on");
     }
 
@@ -479,31 +477,27 @@ export default function Record() {
     };
   }, [narrow]);
 
-  const since = snapshot.createdAt
-    ? new Date(snapshot.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        year: "2-digit",
-      })
-    : "Feb '26";
+  // "Feb '26" / «фев '26» — set from the month table so both printings agree
+  const sinceDate = new Date(snapshot.createdAt || "2026-02-25");
+  const since = `${t("record.months")[sinceDate.getMonth()]} '${String(
+    sinceDate.getFullYear(),
+  ).slice(-2)}`;
 
   return (
     <section className="record" id="record">
       <div className="wrap record__inner">
         <p className="record__folio" data-reveal>
           <span className="record__folio-no">01</span>
-          <span className="record__folio-label">The Record</span>
+          <span className="record__folio-label">{t("record.folio")}</span>
           <ProofMark k="record" />
         </p>
 
         <div className="record__head">
           <h2 className="record__title display" data-reveal>
-            A year, kept in ink.
+            {t("record.title")}
           </h2>
           <p className="record__lede" data-reveal>
-            Every mark below is one day of work on {profile.first}&apos;s public
-            repositories — pulled live from GitHub, the densest stretches charged
-            in {/* terracotta */}red. No streak-farming, no filler. Just the
-            record.
+            {t("record.lede", pick(profile.first))}
           </p>
         </div>
 
@@ -515,13 +509,13 @@ export default function Record() {
             </div>
           </div>
           <div className="record__axis" aria-hidden="true">
-            {ticks.map((t, i) => (
+            {ticks.map((tick, i) => (
               <span
                 key={i}
                 className="record__tick"
-                style={{ left: `${t.x * 100}%` }}
+                style={{ left: `${tick.x * 100}%` }}
               >
-                {t.label}
+                {t("record.months")[tick.m]}
               </span>
             ))}
           </div>
@@ -530,19 +524,19 @@ export default function Record() {
         <dl className="record__ledger" data-reveal>
           <div className="record__entry">
             <dt className="record__entry-val">{snapshot.total}</dt>
-            <dd className="record__entry-label">contributions · last 12 mo</dd>
+            <dd className="record__entry-label">{t("record.contrib")}</dd>
           </div>
           <div className="record__entry">
             <dt className="record__entry-val">{snapshot.longestStreak}d</dt>
-            <dd className="record__entry-label">longest streak</dd>
+            <dd className="record__entry-label">{t("record.streak")}</dd>
           </div>
           <div className="record__entry">
             <dt className="record__entry-val">{repos}</dt>
-            <dd className="record__entry-label">public repositories</dd>
+            <dd className="record__entry-label">{t("record.repos")}</dd>
           </div>
           <div className="record__entry">
             <dt className="record__entry-val">{since}</dt>
-            <dd className="record__entry-label">first commit on record</dd>
+            <dd className="record__entry-label">{t("record.first")}</dd>
           </div>
         </dl>
       </div>

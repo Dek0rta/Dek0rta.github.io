@@ -1,4 +1,5 @@
 import { socials, profile } from "../data";
+import { usePick, useT } from "../i18n.jsx";
 import { ProofTotal } from "./Proof";
 import "./Colophon.css";
 
@@ -23,6 +24,7 @@ const icons = {
 };
 
 function ContactLink({ social }) {
+  const pick = usePick();
   return (
     <a
       className="colo__link"
@@ -32,40 +34,40 @@ function ContactLink({ social }) {
       data-cursor
     >
       <span className="colo__link-icon">{icons[social.icon]}</span>
-      <span className="colo__link-name">{social.name}</span>
+      <span className="colo__link-name">{pick(social.name)}</span>
       <span className="colo__link-handle">{social.handle}</span>
     </a>
   );
 }
 
 export default function Colophon() {
+  const pick = usePick();
+  const t = useT();
   return (
     <footer className="section colophon site-footer" id="connect">
       <div className="wrap">
         <div className="folio" data-reveal>
           <span className="folio__no">05</span>
           <span className="folio__rule" />
-          <span className="folio__label">Colophon</span>
+          <span className="folio__label">{t("colo.folio")}</span>
         </div>
 
         <h2 className="colo__cta display" data-reveal>
-          I&apos;m looking for the place that&apos;ll
-          <span className="colo__em"> let me build at full size.</span>
+          {t("colo.cta1")}
+          <span className="colo__em">{t("colo.cta2")}</span>
         </h2>
 
         <div className="colo__links" data-reveal>
           {socials.map((s) => (
-            <ContactLink key={s.name} social={s} />
+            <ContactLink key={s.icon} social={s} />
           ))}
         </div>
 
         <div className="colo__base" data-reveal>
           <span>
-            {profile.name} · {profile.volume} · {profile.year}
+            {pick(profile.name)} · {profile.volume} · {profile.year}
           </span>
-          <span className="colo__base-note">
-            Set in Fraunces &amp; JetBrains Mono. Built by hand with React, three.js &amp; GSAP.
-          </span>
+          <span className="colo__base-note">{t("colo.note")}</span>
           <ProofTotal />
         </div>
       </div>

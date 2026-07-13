@@ -1,4 +1,5 @@
 import { projects } from "../data";
+import { usePick, useT } from "../i18n.jsx";
 import Tear from "./Tear";
 import { ProofMark } from "./Proof";
 // this very file, as text, at build time — the tear can't show a stale copy
@@ -15,6 +16,8 @@ const Arrow = () => (
 // screenshots set like figures in a printed feature: duotone ink until the
 // cursor passes over — then the plate takes its colour pass.
 function Plates({ project }) {
+  const pick = usePick();
+  const t = useT();
   return (
     <div className="plates">
       {project.plates.map((pl, i) => (
@@ -29,11 +32,11 @@ function Plates({ project }) {
             target="_blank"
             rel="noreferrer"
             data-cursor
-            aria-label={`${project.name} — open live site`}
+            aria-label={t("projects.visit", project.name)}
           >
             <img
               src={pl.src}
-              alt={pl.alt}
+              alt={pick(pl.alt)}
               width={pl.w}
               height={pl.h}
               loading="lazy"
@@ -43,7 +46,7 @@ function Plates({ project }) {
             <span className="plate__fig">
               fig. {pl.fig || String(i + 1).padStart(2, "0")}
             </span>
-            {pl.caption}
+            {pick(pl.caption)}
           </figcaption>
         </figure>
       ))}
@@ -73,6 +76,8 @@ function Transcript({ data }) {
 }
 
 function Entry({ project }) {
+  const pick = usePick();
+  const t = useT();
   return (
     <article
       className={`entry ${project.featured ? "entry--featured" : ""}`}
@@ -80,7 +85,7 @@ function Entry({ project }) {
     >
       <div className="entry__no">
         <span>{project.no}</span>
-        <span className="entry__org">{project.org}</span>
+        <span className="entry__org">{pick(project.org)}</span>
       </div>
 
       <div className="entry__body">
@@ -88,16 +93,16 @@ function Entry({ project }) {
           <h3 className="entry__name display">{project.name}</h3>
           <span className={`entry__metric ${project.live ? "is-live" : ""}`}>
             {project.live && <span className="entry__dot" />}
-            {project.metric}
+            {pick(project.metric)}
           </span>
         </div>
 
-        <p className="entry__desc">{project.desc}</p>
+        <p className="entry__desc">{pick(project.desc)}</p>
 
         {project.facts && (
           <ul className="entry__facts">
             {project.facts.map((f) => (
-              <li key={f}>{f}</li>
+              <li key={f.en ?? f}>{pick(f)}</li>
             ))}
           </ul>
         )}
@@ -116,12 +121,12 @@ function Entry({ project }) {
           <div className="entry__links">
             {project.live && (
               <a className="entry__link entry__link--seal" href={project.live} target="_blank" rel="noreferrer" data-cursor>
-                Open it <Arrow />
+                {t("projects.open")} <Arrow />
               </a>
             )}
             {project.url && (
               <a className="entry__link" href={project.url} target="_blank" rel="noreferrer" data-cursor>
-                Code <Arrow />
+                {t("projects.code")} <Arrow />
               </a>
             )}
           </div>
@@ -132,6 +137,7 @@ function Entry({ project }) {
 }
 
 export default function Projects() {
+  const t = useT();
   return (
     <section className="section projects" id="shipped">
       <Tear source={projectsSource} filename="Projects.jsx">
@@ -139,7 +145,7 @@ export default function Projects() {
           <div className="folio" data-reveal>
             <span className="folio__no">02</span>
             <span className="folio__rule" />
-            <span className="folio__label">What I shipped</span>
+            <span className="folio__label">{t("projects.folio")}</span>
             <ProofMark k="shipped" />
           </div>
 

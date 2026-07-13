@@ -16,7 +16,9 @@
   --card: rgba(18, 17, 15, 0.025);
   --card-border: rgba(18, 17, 15, 0.1);
 
-  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  /* Playfair Display supplies the Cyrillic set Fraunces lacks — the RU
+     printing falls through per-glyph, Latin stays Fraunces */
+  --display: "Fraunces", "Playfair Display", Georgia, "Times New Roman", serif;
   --body: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
   --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
 

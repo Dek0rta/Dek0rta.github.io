@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
+import { useT } from "../i18n.jsx";
 import "./Tear.css";
 
 // THE TEAR — the page admits what it's made of. The bottom-right corner of
@@ -31,6 +32,7 @@ function highlight(src) {
 }
 
 export default function Tear({ source, filename, children }) {
+  const t = useT();
   const rootRef = useRef(null);
   const paperRef = useRef(null);
   const flapRef = useRef(null);
@@ -228,8 +230,8 @@ export default function Tear({ source, filename, children }) {
       <div className="tear__under" aria-hidden="true">
         <pre className="tear__code" dangerouslySetInnerHTML={{ __html: html }} />
         <p className="tear__caption">
-          <span className="tear__caption-mark">◆</span> {filename} — the actual
-          source printing this section. nothing to hide.
+          <span className="tear__caption-mark">◆</span>
+          {t("tear.caption", filename)}
         </p>
       </div>
 
@@ -253,13 +255,11 @@ export default function Tear({ source, filename, children }) {
         ref={tabRef}
         data-cursor
         aria-pressed={open}
-        aria-label={
-          open
-            ? "Repair the page and hide the source code"
-            : "Tear the page corner to reveal this section's source code"
-        }
+        aria-label={open ? t("tear.aria.open") : t("tear.aria.closed")}
       >
-        <span className="tear__tab-label">{open ? "reprint" : "tear"}</span>
+        <span className="tear__tab-label">
+          {open ? t("tear.tab.open") : t("tear.tab.closed")}
+        </span>
       </button>
     </div>
   );

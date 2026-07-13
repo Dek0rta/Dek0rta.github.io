@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { profile } from "../data";
+import { usePick, useT } from "../i18n.jsx";
 import { createInk } from "../ink/fluid";
 import "./Issue.css";
 
@@ -12,6 +13,8 @@ import "./Issue.css";
 export default function Issue({ onDone }) {
   const root = useRef(null);
   const [gone, setGone] = useState(false);
+  const pick = usePick();
+  const t = useT();
 
   useEffect(() => {
     const reduced = window.matchMedia(
@@ -326,15 +329,15 @@ export default function Issue({ onDone }) {
     <div className="issue" ref={root} aria-hidden="true">
       <div className="issue__inner">
         <p className="issue__kicker">
-          <span data-issue-line>The Issue</span>
+          <span data-issue-line>{t("issue.kicker")}</span>
         </p>
 
         <h1 className="issue__name display">
           <span className="issue__mask">
-            <span data-issue-line>{profile.first}</span>
+            <span data-issue-line>{pick(profile.first)}</span>
           </span>
           <span className="issue__mask">
-            <span data-issue-line>{profile.last}</span>
+            <span data-issue-line>{pick(profile.last)}</span>
           </span>
         </h1>
 
@@ -348,7 +351,7 @@ export default function Issue({ onDone }) {
           </span>
         </p>
       </div>
-      <p className="issue__skip">tap / scroll to skip</p>
+      <p className="issue__skip">{t("issue.skip")}</p>
     </div>
   );
 }

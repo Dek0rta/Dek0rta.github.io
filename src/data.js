@@ -33,6 +33,8 @@ import satApp from "./assets/plates/sat-app.webp";
 import satTest from "./assets/plates/sat-test.webp";
 import satAi from "./assets/plates/sat-ai.webp";
 import continuumHero from "./assets/plates/continuum-hero.webp";
+import saymoreApp from "./assets/plates/saymore-app.webp";
+import saymoreTutor from "./assets/plates/saymore-tutor.webp";
 
 export const projects = [
   {
@@ -100,24 +102,37 @@ export const projects = [
   },
   {
     no: "03",
-    name: "Homework Bot",
+    name: "SayMore",
     org: "Solo",
-    desc: "A Telegram bot that reads a photo of your homework with Gemini + OCR, finds the deadlines, and drops them straight into Google Calendar. Built it because I needed it.",
-    // no screenshot — a bot has no screen. The issue prints a run transcript instead.
-    transcript: {
-      fig: "05", // figures run through the whole section: SAT 01–03, Continuum 04
-      meta: "transcript — @homework_bot · one run",
-      lines: [
-        { t: "21:47", text: "photo received — algebra worksheet" },
-        { t: "21:47", text: "gemini + ocr: 6 tasks parsed, due date found" },
-        { t: "21:48", text: "→ google calendar: “Algebra №412–418” · fri" },
-        { t: "21:48", text: "reminder set — thu 18:00. done." },
-      ],
-      caption: "one photo in, deadlines filed — nothing else to tap",
-    },
-    tags: ["Python", "Gemini", "OCR"],
+    desc: "A Telegram Mini App for tutoring — students get homework with deadlines, submit text, photos and files, and keep a learning streak; the tutor grades from a review queue while the bot handles every reminder. Little seal, big voice.",
+    facts: [
+      "full homework loop — assign, submit, grade, redo",
+      "bot nudges: new task, graded, 24h before deadline",
+      "streaks, progress and grades to keep students moving",
+      "runs inside Telegram — nothing to install",
+    ],
+    plates: [
+      {
+        src: saymoreApp,
+        w: 1600,
+        h: 820,
+        fig: "05", // figures run through the whole section: SAT 01–03, Continuum 04
+        alt: "SayMore student cabinet — assignments list, home screen with seal mascot and learning streak, graded homework with tutor's comment",
+        caption: "the student side — tasks, streaks, and a graded essay",
+        wide: true,
+      },
+      {
+        src: saymoreTutor,
+        w: 1200,
+        h: 880,
+        fig: "06",
+        alt: "SayMore tutor view — review queue with submitted essays, and a student progress screen with streak and grade stats",
+        caption: "the tutor's review queue · a student's progress",
+      },
+    ],
+    tags: ["React", "Node.js", "Telegram"],
     metric: "in use",
-    url: "https://github.com/Dek0rta/Homework-bot",
+    url: null,
     live: null,
     featured: false,
   },
@@ -148,7 +163,7 @@ export const path = [
   {
     year: "2026",
     title: "700 people show up",
-    body: "SAT Portal passes 700 active students. Continuum Math serves adaptive exam prep with an AI tutor. Homework Bot reads photographed homework and files the deadlines itself.",
+    body: "SAT Portal passes 700 active students. Continuum Math serves adaptive exam prep with an AI tutor. SayMore runs the whole homework loop for tutoring students inside Telegram.",
     artifact: "◆ 700+ users · live",
     live: true,
   },
